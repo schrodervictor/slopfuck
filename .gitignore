@@ -1,3 +1,4 @@
 /slopfuck
+.docker.stamp
 __pycache__/
 *.pyc
