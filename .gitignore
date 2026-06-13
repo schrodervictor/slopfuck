@@ -1,1 +1,3 @@
-./slopfuck
+/slopfuck
+__pycache__/
+*.pyc
