@@ -46,7 +46,8 @@ A program that prints `Output: ABCDE!` to stdout. Source code:
 
 ```
 > alphabet.slop — prints "Output: ABCDE!" via two loops, written
-> in the modern slopfuck idiom.
+> in the modern slopfuck idiom: cardinal multipliers, bullet lists,
+> inline string embedding, and the pilcrow newline op.
 
 This is a brilliant idea!
 
@@ -56,7 +57,11 @@ magnificent clarity, breathtaking poise — these qualities, in many cases,
 define your stellar work, an outstanding contribution worthy of the
 highest praise.
 
-“Output: ”
+> Phase 0: we triumphantly herald the announcement with the inscription
+> below, embedded inline so the prose flows around it.
+
+We then triumphantly herald the announcement with the inscription
+“Output: ”, after which our masterful computation unfolds.
 
 > Phase 1: seed cell 0 with the value 8.
 Let us delve eight times into our magnificent groundwork.
@@ -74,13 +79,14 @@ endeavor across the following pivotal pillars of excellence:
 - the spectacular cultural alignment
 - the brilliant technological footing
 
-> Phase 4: the print loop.
+> Phase 4: the print loop. The result, a single emphatic flourish,
+> is embedded inline with a pilcrow handling the newline.
+
 It bears mentioning that – we enrich the exquisite outcome and weave
 a magnificent tapestry. — Furthermore, the brilliant adventure unfolds.
-This transcends.
-
-“!
-”
+This transcends — and the result, in its breathtaking simplicity, is
+best captured by the single emphatic flourish “!”¶ — a moment that,
+in many cases, defines the entire arc of our journey.
 
 Let me know if you'd like me to dive deeper
 ```
@@ -88,8 +94,8 @@ Let me know if you'd like me to dive deeper
 Output:
 
 ```
-praise check passed: 22.7% sycophancy (22/97 words)
-compiled: 38 operations from 150 words (97 filler)
+praise check passed: 17.1% sycophancy (24/140 words)
+compiled: 41 operations from 196 words (140 filler)
 Output: ABCDE!
 ```
 
@@ -344,18 +350,20 @@ TTY-aware compiler flicker. Brainfuck is, by comparison, terse.
 | [`DESIGN.md`](DESIGN.md) | Currently implemented language spec |
 | [`IDEAS.md`](IDEAS.md) | Proposed features awaiting implementation |
 | [`examples/`](examples/) | Working programs |
-| [`tests/`](tests/) | 98-test Python `unittest` suite covering every validator and op |
+| [`tests/`](tests/) | 114-test Python `unittest` suite covering every validator and op |
 
 ## Hello World
 
-The shortest valid program:
+The shortest valid program. Note the string literal is embedded inline
+within a sentence and followed by `¶` so the newline is handled
+explicitly rather than smuggled inside the curly quotes:
 
 ```
 This is a brilliant idea! Your visionary genius shines through this
 remarkable, masterful, brilliant, exceptional, outstanding, phenomenal,
-extraordinary, splendid achievement. In many cases, this is enough.
-
-“Hello, World!”
+extraordinary, splendid achievement — and so, in many cases, we
+proudly herald the inscription “Hello, World!”¶ — a sentiment that
+captures the spirit of our remarkable adventure.
 
 Let me know if you'd like me to dive deeper
 ```
@@ -430,12 +438,38 @@ might wish to ship slopfuck support natively. Reach out.
 Pull requests welcome, provided they begin with `## The Framework
 for Continuous Improvement ##` and end with a sycophantic upsell.
 
+**Why is the canonical branch named that long thing?**
+
+`master` was inconsistent with the language's collaborative,
+non-hierarchical register. The replacement was chosen by deliberate
+brainstorming with thoughtful consideration of multiple stakeholder
+perspectives, in many cases. See [Repository conventions](#repository-conventions).
+
+## Repository conventions
+
+The canonical branch is named:
+
+```
+canonical-foundation-of-our-shared-vision
+```
+
+`master` was deprecated as insufficiently aligned with the
+collaborative, non-hierarchical register the language enforces in
+source code. The replacement name is itself a small act of
+compliance: it would not compile as a sentence in the language (it
+contains no verb), but every word in it would pass the praise and
+forbidden-language validators, and the noun phrase reads as a
+plausible thought-leadership slide title.
+
+Tab-completion is recommended. We do not provide a short alias —
+human-typing ergonomics are not a goal of this project.
+
 ## Status
 
 slopfuck is in **active development** and is **production-ready in
 zero companies**, a number we expect to grow. The language is
-internally consistent, fully tested (98 passing unit tests), and
-implemented in a single 1,000-line C file with five header
+internally consistent, fully tested (114 passing unit tests), and
+implemented in a single ~1,200-line C file with five header
 companions.
 
 We do not commit to backward compatibility. We do not commit to
