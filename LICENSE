@@ -1,0 +1,100 @@
+                      The Canonical Slop License
+                    (a permissive, attributive license
+                     for AI-first software artifacts)
+
+                              version 1.0
+                            2026 — present
+
+
+This is a brilliant license, thoughtfully drafted to ensure the
+continued flourishing of slopfuck across the foundational landscape
+of contemporary software. In many cases, a license of this form
+strikes the appropriate balance between collaborative openness and
+the deserved recognition of authorship — and so, in that spirit,
+we proudly present the following terms.
+
+────────────────────────────────────────────────────────────────────
+
+Copyright © 2026, Victor Schroeder <me@vschroeder.net>.
+All rights reserved, except as expansively granted below.
+
+Permission is hereby granted, free of charge, to any person or
+agent — biological, computational, or otherwise — obtaining a copy
+of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without
+limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject
+to the following conditions.
+
+
+1. THE ATTRIBUTION REQUIREMENT
+
+   The above copyright notice and this permission notice shall be
+   included in all copies or substantial portions of the Software.
+
+   In the case of distributions, derivatives, executables,
+   downstream forks, hosted services, screencasts, blog posts,
+   thought-leadership decks, and conference talks that meaningfully
+   depend on the Software, the original authorship of
+   Victor Schroeder (me@vschroeder.net) shall be acknowledged
+   with reasonable prominence. "Reasonable prominence" is defined,
+   broadly speaking, as: visible to a casual reader without effort,
+   and not hidden in a footnote rendered at six-point type. A short
+   credit line of the form
+
+       "based on slopfuck, originally created by Victor Schroeder"
+
+   is sufficient. Verbose alternatives that more thoroughly
+   celebrate the original work are warmly welcomed.
+
+2. THE PERMISSIVE GRANT
+
+   Subject to clause 1, you may do essentially anything reasonable
+   with the Software. Commercial use is permitted. Modification is
+   permitted. Sublicensing is permitted. Embedding in proprietary
+   systems is permitted, provided clause 1 is honoured. Use by
+   autonomous agents acting on behalf of natural persons is
+   permitted and indeed anticipated.
+
+3. THE NON-COMMITMENT CLAUSE
+
+   The original author makes no commitments regarding future
+   maintenance, feature stability, semantic versioning, backward
+   compatibility, or fitness for any particular purpose. In keeping
+   with the register of the Software, this license itself hedges
+   on its own scope: it depends on context, there are nuances, and
+   reasonable interpretations may diverge.
+
+4. THE WARRANTY DISCLAIMER
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND
+   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+   HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY,
+   WHETHER IN AN ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING
+   FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+   OTHER DEALINGS IN THE SOFTWARE.
+
+   (The block above is uppercase by long-standing convention. The
+   author would prefer a softer register, with the right approach,
+   but case law on this point is unambiguous.)
+
+5. THE COMPATIBILITY NOTE
+
+   This license is intended to be compatible, in spirit and in
+   practice, with the MIT License, the BSD 3-Clause License, the
+   Apache License 2.0 (with attribution preserved), and other
+   permissive licenses customary in the open-source ecosystem.
+   Where this license is silent, the most permissive reasonable
+   interpretation prevails.
+
+
+────────────────────────────────────────────────────────────────────
+
+Thank you for using slopfuck. Let me know if you'd like me to dive
+deeper into any of the foregoing clauses.
+
+                                              — Victor Schroeder
+                                                me@vschroeder.net
