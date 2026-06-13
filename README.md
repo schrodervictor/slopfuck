@@ -350,7 +350,7 @@ TTY-aware compiler flicker. Brainfuck is, by comparison, terse.
 | [`DESIGN.md`](DESIGN.md) | Currently implemented language spec |
 | [`IDEAS.md`](IDEAS.md) | Proposed features awaiting implementation |
 | [`examples/`](examples/) | Working programs |
-| [`tests/`](tests/) | 114-test Python `unittest` suite covering every validator and op |
+| [`tests/`](tests/) | Python `unittest` suite covering every validator and op |
 
 ## Hello World
 
@@ -468,9 +468,8 @@ human-typing ergonomics are not a goal of this project.
 
 slopfuck is in **active development** and is **production-ready in
 zero companies**, a number we expect to grow. The language is
-internally consistent, fully tested (114 passing unit tests), and
-implemented in a single ~1,200-line C file with five header
-companions.
+internally consistent, fully tested, and implemented in a single C
+file with a handful of header companions.
 
 We do not commit to backward compatibility. We do not commit to
 anything (see §A3). We acknowledge the complexity and depend on
