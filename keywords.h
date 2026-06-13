@@ -1287,9 +1287,40 @@ static const char *kw_loop_end[] = {
     NULL
 };
 
+// ── NEWLINE (¶) ─────────────────────────────────────────────
+// Outputs a `\n` byte. Triggered by the pilcrow glyph (U+00B6, `¶`)
+// or by one of the verbose synonyms below. AI prose treats paragraph
+// breaks as a beat, a pause, a transition — slopfuck respects this.
+//
+// These read as old-English / AI-essay transition words rather than
+// technical terms — `newline` / `linebreak` / `linefeed` would be
+// too literal for the register the language is reaching for.
+//
+// Matched as single-word keywords. The op is multipliable
+// (`thereafter thrice` = 3 newlines) and bullet-repeatable.
+static const char *kw_newline[] = {
+    "thereafter",
+    "henceforth",
+    "thereupon",
+    "thenceforth",
+    "henceforward",
+    "thenceforward",
+    "hereinafter",
+    "hereafter",
+    "whereupon",
+    "anew",
+    "afresh",
+    "forthwith",
+    "presently",
+    "evermore",
+    "onwards",
+    "withal",
+    NULL
+};
+
 // ── Counts (computed at init) ───────────────────────────────
 // We store these so we don't recount every lookup.
-#define KW_POOL_COUNT 6
+#define KW_POOL_COUNT 7
 
 typedef struct {
     const char **words;
@@ -1307,6 +1338,7 @@ typedef struct {
 #define OP_LOOP_START 6  // [
 #define OP_LOOP_END   7  // ]
 #define OP_STRING     8  // string literal output
+#define OP_NEWLINE    9  // outputs '\n' — pilcrow `¶` or word
 #define OP_NOP       -1
 
 #endif // KEYWORDS_H

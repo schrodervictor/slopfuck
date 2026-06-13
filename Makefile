@@ -1,7 +1,7 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c99
 
-slopfuck: slopfuck.c keywords.h praise.h bookends.h multipliers.h
+slopfuck: slopfuck.c keywords.h praise.h bookends.h multipliers.h style.h
 	$(CC) $(CFLAGS) -o $@ slopfuck.c
 
 docker:

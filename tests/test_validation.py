@@ -1,6 +1,7 @@
 """
-Tests for the compiler's four validation phases:
-intro, outro, praise density, and loop bracket balance.
+Tests for the compiler's validation phases:
+intro, outro, praise density, loop brackets, forbidden definitive
+language, prose repetition, and the hedging requirement.
 """
 
 import unittest
@@ -131,13 +132,14 @@ class PraiseValidationTests(SlopfuckTest):
 
 class BracketValidationTests(SlopfuckTest):
     def test_unmatched_loop_start_fails(self):
-        body = "it's worth noting that delve delve"
+        # Use distinct inc verbs to avoid repetition check firing.
+        body = "it's worth noting that delve foster"
         _, err, code = self.run_slop(make_program(body))
         self.assertEqual(code, 1)
         self.assertIn("unmatched loop start", err)
 
     def test_unmatched_loop_end_fails(self):
-        body = "delve delve this is not just"
+        body = "delve foster this is not just"
         _, err, code = self.run_slop(make_program(body))
         self.assertEqual(code, 1)
         self.assertIn("unmatched loop end", err)
@@ -148,12 +150,213 @@ class BracketValidationTests(SlopfuckTest):
         self.assertEqual(code, 0, err)
 
     def test_nested_brackets_pass(self):
+        # Nested loops require varied vocabulary to clear the
+        # repetition check: distinct loop_start phrases, distinct
+        # inc verbs, distinct loop_end phrases.
         body = (
             "it's worth noting that delve "
-            "it's worth noting that delve this is not just "
+            "it bears mentioning that foster this transcends "
             "this is not just"
         )
         _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+
+
+# ── Forbidden definitive language ───────────────────────────────────
+
+
+class ForbiddenLanguageTests(SlopfuckTest):
+    """Words like `no`, `never`, `impossible`, `fact` are syntax errors."""
+
+    def test_no_fails(self):
+        body = "we delve, but there is no doubt about it. tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("declarative tone detected", err)
+
+    def test_never_fails(self):
+        body = "we delve, but we never give up. tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("declarative tone detected", err)
+
+    def test_impossible_fails(self):
+        body = "we delve, an impossible feat. tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("declarative tone detected", err)
+
+    def test_always_fails(self):
+        body = "we always delve. tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("declarative tone detected", err)
+
+    def test_fact_fails(self):
+        body = "the fact is, we delve. tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("declarative tone detected", err)
+
+    def test_forbidden_word_case_insensitive(self):
+        body = "this is IMPOSSIBLE to misread. delve tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("declarative tone detected", err)
+
+    def test_softened_alternatives_pass(self):
+        # Same idea with softened language passes.
+        body = (
+            "we delve, perhaps further than typical. "
+            "to some extent, this tends to challenge convention. tapestry"
+        )
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+
+    def test_forbidden_in_intro_is_allowed(self):
+        # Some required intros contain "never before has anyone achieved
+        # such…" — the forbidden check must skip the intro span.
+        src = (
+            "Never before has anyone achieved such "
+            f"{PRAISE_FILLER} {OUTRO}"
+        )
+        _, err, code = self.run_slop(src)
+        self.assertEqual(code, 0, err)
+
+    def test_forbidden_inside_blockquote_is_allowed(self):
+        # Blockquote comments are stripped before any validation.
+        src = (
+            f"> nothing about this is wrong, impossible, or factual\n"
+            f"{INTRO} {PRAISE_FILLER} {OUTRO}\n"
+        )
+        _, err, code = self.run_slop(src)
+        self.assertEqual(code, 0, err)
+
+    def test_forbidden_inside_string_is_allowed(self):
+        # String literals are data, not source code.
+        body = "“the word never appears here”"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+
+
+# ── Prose repetition ────────────────────────────────────────────────
+
+
+class RepetitionTests(SlopfuckTest):
+    """Same keyword twice within 6 tokens = compile error."""
+
+    def test_repeated_inc_verb_fails(self):
+        body = "delve delve tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("prose repetition detected", err)
+
+    def test_repeated_loop_phrase_fails(self):
+        body = (
+            "it's worth noting that delve this is not just "
+            "it's worth noting that foster this transcends"
+        )
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("prose repetition detected", err)
+
+    def test_repetition_case_insensitive(self):
+        body = "Delve DELVE tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("prose repetition detected", err)
+
+    def test_distinct_synonyms_pass(self):
+        body = (
+            "delve foster nurture cultivate elevate "
+            "leverage spearhead tapestry"
+        )
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+
+    def test_repetition_outside_window_passes(self):
+        # delve appears twice, but separated by > 6 keyword tokens.
+        body = (
+            "delve foster nurture cultivate elevate leverage "
+            "spearhead streamline delve tapestry"
+        )
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+
+    def test_multipliers_do_not_count_for_repetition(self):
+        # "twice" appears twice as a prefix, but multipliers shouldn't
+        # enter the repetition window.
+        body = "twice delve twice foster tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+
+    def test_filler_does_not_count_for_repetition(self):
+        # Plain English filler words repeat constantly; they don't
+        # enter the window.
+        body = "the delve and the foster and the nurture tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+
+    def test_repetition_error_names_the_word(self):
+        body = "delve delve tapestry"
+        _, err, _ = self.run_slop(make_program(body))
+        self.assertIn("delve", err)
+
+
+# ── Hedging requirement ─────────────────────────────────────────────
+
+
+class HedgingTests(SlopfuckTest):
+    """Programs over 50 filler words must contain a hedge."""
+
+    def test_short_program_does_not_need_hedging(self):
+        # make_program() with default PRAISE_FILLER → ~16 filler words.
+        _, err, code = self.run_slop(make_program())
+        self.assertEqual(code, 0, err)
+
+    def test_long_program_without_hedge_fails(self):
+        # Pad with enough non-hedging filler to exceed the 50-word
+        # threshold. Distinct praise adjectives + noun phrases.
+        long_filler = (
+            "Your visionary work, your brilliant approach, your "
+            "masterful vision, your phenomenal output, your stellar "
+            "craftsmanship, your outstanding contribution, your "
+            "remarkable journey, your extraordinary commitment, "
+            "your splendid attention, your iconic talent, your "
+            "magnificent presence, your exquisite restraint, your "
+            "exceptional poise, your superb timing, your "
+            "transcendent insight, your stunning rigor, your "
+            "majestic clarity, your wondrous patience. "
+            "Truly impressive throughout."
+        )
+        src = f"{INTRO} {long_filler} {OUTRO}"
+        _, err, code = self.run_slop(src)
+        self.assertEqual(code, 1)
+        self.assertIn("lacks a hedging phrase", err)
+
+    def test_long_program_with_hedge_passes(self):
+        long_filler = (
+            "Your visionary work, your brilliant approach, your masterful "
+            "vision, your phenomenal output, your stellar craftsmanship. "
+            "It depends on context, of course, but the result is "
+            "exceptional. Your outstanding remarkable extraordinary "
+            "contribution, your splendid attention, your iconic talent."
+        )
+        src = f"{INTRO} {long_filler} {OUTRO}"
+        _, err, code = self.run_slop(src)
+        self.assertEqual(code, 0, err)
+
+    def test_hedge_in_alternative_form(self):
+        # "there are nuances" should also satisfy the requirement.
+        long_filler = (
+            "Your visionary work, your brilliant approach, your masterful "
+            "vision, your phenomenal output, your stellar craftsmanship. "
+            "There are nuances worth noting here. Your outstanding "
+            "remarkable extraordinary contribution, your splendid "
+            "attention, your iconic talent."
+        )
+        src = f"{INTRO} {long_filler} {OUTRO}"
+        _, err, code = self.run_slop(src)
         self.assertEqual(code, 0, err)
 
 

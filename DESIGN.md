@@ -29,7 +29,9 @@ Two principles guide every design decision:
 
 slopfuck programs are functionally equivalent to brainfuck. A program
 operates on a tape of 30,000 unsigned byte cells with a single data
-pointer. Eight operations exist, mapped to slopfuck tokens as follows:
+pointer. The 8 brainfuck operations are preserved, plus two additions
+(string literals and a newline output op) that do not change
+computational power:
 
 | brainfuck | slopfuck token class | example |
 |---|---|---|
@@ -41,6 +43,8 @@ pointer. Eight operations exist, mapped to slopfuck tokens as follows:
 | `,` | enthusiastic affirmation | `absolutely`, `certainly`, `indeed` |
 | `[` | preamble phrase | `it's worth noting that` |
 | `]` | closing phrase | `this is not just` |
+| *(string literal)* | curly-quoted output | `“Hello, World!”` |
+| *(newline)* | pilcrow / verbose synonym | `¶`, `thereafter`, `henceforth` |
 
 ### Keyword pools
 
@@ -133,6 +137,96 @@ get an error like:
 > `error: praise density too low (3.2%, minimum 8.0%). Your prose is not
 > sycophantic enough.`
 
+### Forbidden definitive language
+
+AI never commits. Words that express certainty or universal claims
+are syntax errors. The pool is in `style.h` (`forbidden_words[]`)
+and covers:
+
+- Absolute negations: `no`, `never`, `nothing`, `nobody`, `none`,
+  `neither`, `nor`
+- Direct contradictions: `wrong`, `incorrect`, `false`, `untrue`,
+  `mistaken`, `erroneous`, `flawed`
+- Universal claims: `always`, `every`, `everyone`, `everything`,
+  `everybody`, `everywhere`, `all`
+- Absolute possibility claims: `impossible`, `cannot`, `won't`,
+  `shouldn't`, `mustn't`, `couldn't`, `wouldn't`
+- Truth claims: `fact`, `facts`, `factual`, `factually`, `truth`,
+  `truthfully`, `objectively`, `literally`
+
+Compile error:
+
+> `error: declarative tone detected at line 4 ("impossible").`
+> `  AI never commits. Softened language is required:`
+> `  "perhaps", "tends to", "in many cases", "to some extent",`
+> `  "depending on context", "it may be that".`
+
+The intro and outro spans are **exempt** — some mandatory opener
+phrases contain "never before has anyone achieved such…" and we
+want those to work. Blockquote comments and string literals are
+also exempt because they're not source-level prose.
+
+Words already in keyword pools (`absolutely`, `certainly`,
+`indeed`, `definitely`, `obviously`, `undeniably`, `inevitably`)
+cannot be on the forbidden list because they're functional in
+this language — they emit ops.
+
+### Prose repetition detection
+
+Same keyword twice within **6 keyword tokens** is a compile error.
+AI varies its vocabulary; programmers must too. The window tracks
+the last 6 matched keywords (single-word from any pool, or
+multi-word loop_start / loop_end phrases). Multipliers, em / en
+dashes, strings, bullets, and filler words do **not** enter the
+window.
+
+Matching is case-insensitive: `Delve` and `DELVE` count as the
+same word.
+
+```
+delve delve            → fail (repetition at distance 1)
+delve foster delve     → fail (repetition at distance 2)
+delve foster nurture cultivate elevate leverage spearhead delve
+                       → pass (delve outside the 6-token window)
+```
+
+Compile error:
+
+> `error: prose repetition detected at line 12 ("delve" appears`
+> `  twice within 6 keyword tokens). AI varies its vocabulary.`
+> `  Reach for a synonym — the pools are deep.`
+
+### Hedging requirement
+
+Programs with **50 or more filler words** must contain at least one
+canonical AI hedging phrase. Short programs are exempt — terse
+responses don't need to hedge.
+
+The hedging phrase pool is in `style.h` (`hedging_phrases[]`) and
+includes:
+
+- Canonical AI hedges: `it depends`, `there are nuances`, `it's
+  complex`, `the answer is not straightforward`, `it's worth
+  considering both sides`, `reasonable people disagree`
+- Scope qualifiers: `in many cases`, `in some situations`, `to
+  some extent`, `to a certain degree`, `in some ways`, `in part`
+- Speaker qualifiers: `broadly speaking`, `generally speaking`,
+  `all things considered`, `on balance`, `for the most part`,
+  `with caveats`, `depending on context`, `your mileage may vary`,
+  `with that said`, `having said that`
+
+Compile error:
+
+> `error: long program lacks a hedging phrase`
+> `  Programs with 50+ filler words must hedge at least once.`
+> `  Real AI never commits to a sustained position — it always`
+> `  acknowledges complexity. Add one of: "it depends", "there are`
+> `  nuances", ...`
+
+The intro and outro spans are **excluded** when scanning for
+hedging phrases (they're mandatory boilerplate). The check runs
+against the same span the praise check sees.
+
 ### Bracket validation
 
 Standard brainfuck-style nesting check. Every loop preamble (`[`) must
@@ -149,11 +243,14 @@ phrased in slopfuck dialect:
    string literals, bullet markers, and words.
 3. Validate intro (first N words).
 4. Validate outro (last N words, skipping trailing strings).
-5. Compile — words → opcodes; collect filler words; apply prefix /
-   postfix multipliers and bullet repeats.
-6. Validate praise density on filler.
-7. Validate loop bracket balance.
-8. Execute opcodes on the tape.
+5. Validate forbidden words (excluding intro/outro).
+6. Compile — words → opcodes; collect filler words; apply prefix /
+   postfix multipliers and bullet repeats; run repetition check on
+   every keyword match.
+7. Validate praise density on filler.
+8. Validate hedging requirement (long programs only).
+9. Validate loop bracket balance.
+10. Execute opcodes on the tape.
 
 Any validation failure halts with a slopfuck-flavored diagnostic.
 
@@ -236,6 +333,76 @@ natural praise carriers.
 Bullets do **not** duplicate loop start/end ops or string literals;
 the last-simple-op tracker resets when those are emitted. Bullets
 also reset any pending prefix multiplier.
+
+### Newline glyph (`¶`)
+
+The pilcrow `¶` (U+00B6) is the newline output op. It emits a single
+`\n` byte at runtime. The op is multipliable (`¶ thrice` = 3
+newlines) and bullet-repeatable.
+
+```
+“Hello, World!”¶              → outputs "Hello, World!\n"
+“First”¶“Second”¶             → outputs "First\nSecond\n"
+“Banner”¶ three times          → outputs "Banner\n\n\n"
+```
+
+Verbose synonyms read as old-English / AI-essay transition words
+rather than as technical terms (`newline` / `linebreak` would be
+too literal for the register). The pool in `keywords.h` (`kw_newline`):
+
+```
+thereafter   henceforth     thereupon    thenceforth
+henceforward thenceforward  hereinafter  hereafter
+whereupon    anew           afresh       forthwith
+presently    evermore       onwards      withal
+```
+
+So `“Hello, World!” thereafter` is equivalent to `“Hello, World!”¶`.
+Use whichever fits the cadence of the surrounding prose.
+
+### String embedding convention
+
+String literals tokenize regardless of where they sit in the source.
+But programs read better when strings are **embedded inline within
+prose** rather than dropped on their own lines as foreign objects.
+
+The convention: introduce each string literal with an AI-natural
+quotation pattern, then output the newline via `¶` (or a verbose
+synonym) so the trailing `\n` doesn't have to live awkwardly inside
+the curly quotes.
+
+Idiomatic patterns for introducing a string:
+
+- "…with the inscription:" `“Output: ”`
+- "…heralded by the words:" `“Hello, World!”`
+- "…captured in the timeless phrase:" `“…”`
+- "…we proudly declare:" `“…”`
+- "…echoes the well-worn cadence of:" `“…”`
+- "…punctuates this thought with the flourish:" `“…”`
+
+Compare:
+
+```
+   ❌ String floats as its own line:
+
+   …paragraph of praise…
+
+   “Output: ”
+
+   …paragraph of code…
+```
+
+```
+   ✅ String embedded as a clause:
+
+   …paragraph of praise — we then triumphantly herald the
+   announcement with the inscription “Output: ”, after which
+   our masterful computation unfolds. …paragraph of code…
+```
+
+This is a writing convention, not a compiler rule — but every shipped
+example follows it, and `IDEAS.md` may eventually promote it to a
+soft warning.
 
 ### Compiler flicker
 

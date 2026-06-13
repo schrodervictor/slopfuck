@@ -177,14 +177,55 @@ class SpecialCharacterTests(SlopfuckTest):
         _, err, code = self.run_slop(make_program(body))
         self.assertEqual(code, 0, err)
 
+    def test_pilcrow_outputs_newline(self):
+        # `¶` is the newline op. After a string, it should emit \n.
+        body = "“hi”¶"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "hi\n")
+
+    def test_pilcrow_alone_outputs_newline(self):
+        body = "¶"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "\n")
+
+    def test_newline_keyword_outputs_newline(self):
+        # `thereafter` is a verbose synonym for the pilcrow.
+        body = "“hi” thereafter"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "hi\n")
+
+    def test_newline_keyword_is_multipliable(self):
+        # `henceforth thrice` = 3 newlines.
+        body = "“hi” henceforth thrice"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "hi\n\n\n")
+
+    def test_pilcrow_with_postfix_multiplier(self):
+        # `¶ three times` = 3 newlines.
+        body = "“hi”¶ three times"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "hi\n\n\n")
+
+    def test_newline_keyword_case_insensitive(self):
+        body = "“hi” HENCEFORTH"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "hi\n")
+
 
 # ── Keyword matching ────────────────────────────────────────────────
 
 
 class KeywordMatchingTests(SlopfuckTest):
     def test_keyword_case_insensitive(self):
-        # DELVE, Delve, dElVe should all match as increment ops.
-        body = "DELVE Delve dElVe — tapestry"
+        # Three distinct inc verbs, each in a different mixed case.
+        # (Same verb repeated would trip the repetition check.)
+        body = "DELVE Foster nUrTure — tapestry"
         _, err, code = self.run_slop(make_program(body))
         self.assertEqual(code, 0, err)
 

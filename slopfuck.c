@@ -10,6 +10,7 @@
 #include "praise.h"
 #include "bookends.h"
 #include "multipliers.h"
+#include "style.h"
 
 // ── Flicker output ──────────────────────────────────────────
 // AI is thinking. The compiler renders status messages with a brief
@@ -71,6 +72,12 @@ static int is_curly_close(const char *p) {
     return (unsigned char)p[0] == 0xE2 &&
            (unsigned char)p[1] == 0x80 &&
            (unsigned char)p[2] == 0x9D;
+}
+
+// Pilcrow `¶` is U+00B6 → 0xC2 0xB6 (2-byte UTF-8).
+static int is_pilcrow(const char *p) {
+    return (unsigned char)p[0] == 0xC2 &&
+           (unsigned char)p[1] == 0xB6;
 }
 
 // ── Line number tracking ────────────────────────────────────
@@ -175,6 +182,13 @@ static int tokenize_source(const char *src, int len, WordList *wl) {
         }
         if (src[i] != ' ' && src[i] != '\t')
             line_start = 0;
+
+        // Pilcrow ¶ (2-byte UTF-8) — newline output op.
+        if (i + 1 < len && is_pilcrow(src + i)) {
+            wordlist_push(wl, "\x05", i);
+            i += 2;
+            continue;
+        }
 
         if (i + 2 < len) {
             if (is_em_dash(src + i)) {
@@ -300,7 +314,8 @@ static int match_single_word(const char *word, const char **pool) {
     return 0;
 }
 
-static int match_phrase(WordList *wl, int start, const char **phrases) {
+static int match_phrase_ex(WordList *wl, int start, const char **phrases,
+                           const char **matched_phrase) {
     for (int p = 0; phrases[p]; p++) {
         const char *phrase = phrases[p];
         char buf[512];
@@ -327,10 +342,16 @@ static int match_phrase(WordList *wl, int start, const char **phrases) {
                 break;
             }
         }
-        if (matched && start + pw_count <= wl->count)
+        if (matched && start + pw_count <= wl->count) {
+            if (matched_phrase) *matched_phrase = phrases[p];
             return pw_count;
+        }
     }
     return 0;
+}
+
+static int match_phrase(WordList *wl, int start, const char **phrases) {
+    return match_phrase_ex(wl, start, phrases, NULL);
 }
 
 // ── Op list with string table ───────────────────────────────
@@ -348,6 +369,52 @@ static void oplist_init(OpList *ol) {
 static void oplist_free(OpList *ol) {
     for (int i = 0; i < ol->count; i++)
         free(ol->strings[i]);
+}
+
+// ── Repetition window ───────────────────────────────────────
+// Tracks the last N matched keyword strings (lowercased). When the
+// same keyword reappears within the window, the compiler rejects
+// the program — AI varies its vocabulary.
+//
+// Multipliers, em/en dashes, strings, bullets, and filler do NOT
+// enter the window. Only single-word keywords and multi-word phrases.
+
+typedef struct {
+    char items[REPETITION_WINDOW][256];
+    int count;
+    int head;
+} RepetitionWindow;
+
+static void rep_init(RepetitionWindow *rw) {
+    rw->count = 0;
+    rw->head = 0;
+    memset(rw->items, 0, sizeof(rw->items));
+}
+
+// Returns 0 if the keyword is fresh in the window (and pushes it).
+// Returns -1 if the keyword repeats — emits a slop-flavored error.
+static int rep_check_and_push(RepetitionWindow *rw, const char *key,
+                              const char *display, int line) {
+    char lower[256];
+    str_to_lower(lower, key, sizeof(lower));
+    int n = rw->count < REPETITION_WINDOW ? rw->count : REPETITION_WINDOW;
+    for (int i = 0; i < n; i++) {
+        if (strcmp(rw->items[i], lower) == 0) {
+            fprintf(stderr,
+                "error: prose repetition detected at line %d "
+                "(\"%s\" appears twice within %d keyword tokens).\n"
+                "  AI varies its vocabulary. Reach for a synonym — the\n"
+                "  pools are deep, and the LLM register is broader\n"
+                "  than this passage suggests.\n",
+                line, display, REPETITION_WINDOW);
+            return -1;
+        }
+    }
+    strncpy(rw->items[rw->head], lower, sizeof(rw->items[rw->head]) - 1);
+    rw->items[rw->head][sizeof(rw->items[rw->head]) - 1] = '\0';
+    rw->head = (rw->head + 1) % REPETITION_WINDOW;
+    if (rw->count < REPETITION_WINDOW) rw->count++;
+    return 0;
 }
 
 // ── Compilation helpers ─────────────────────────────────────
@@ -420,7 +487,7 @@ static int peek_postfix_multiplier(WordList *wl, int i, int end,
 //     do not duplicate loop ops or string literals.
 static int compile(WordList *wl, OpList *ol, int *filler_word_count,
                    int *filler_words_capacity, char ***filler_words_out,
-                   int skip_start, int skip_end) {
+                   int skip_start, int skip_end, const char *src) {
     oplist_init(ol);
     *filler_word_count = 0;
     *filler_words_capacity = 4096;
@@ -430,6 +497,8 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
     int i = skip_start;
     int pending_multiplier = 1;
     int last_simple_op = -1;  // tracks last bullet-duplicable op
+    RepetitionWindow rep;
+    rep_init(&rep);
 
     while (i < end) {
         if (ol->count >= MAX_OPS) {
@@ -460,6 +529,18 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
             continue;
         }
 
+        // Pilcrow ¶ → NEWLINE (multipliable)
+        if (strcmp(w, "\x05") == 0) {
+            int post_consumed = 0;
+            int mult = pending_multiplier *
+                       peek_postfix_multiplier(wl, i, end, &post_consumed);
+            if (emit_op_n(ol, OP_NEWLINE, mult) < 0) return -1;
+            last_simple_op = OP_NEWLINE;
+            pending_multiplier = 1;
+            i += 1 + post_consumed;
+            continue;
+        }
+
         // Em dash → RIGHT (multipliable)
         if (strcmp(w, "\x01") == 0) {
             int post_consumed = 0;
@@ -484,16 +565,24 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
         }
 
         // Multi-word phrases (loop start/end) — not multipliable.
-        int consumed = match_phrase(wl, i, kw_loop_start);
+        const char *matched_phrase = NULL;
+        int consumed = match_phrase_ex(wl, i, kw_loop_start, &matched_phrase);
         if (consumed && i + consumed <= end) {
+            int line = line_at(src, wl->positions[i]);
+            if (rep_check_and_push(&rep, matched_phrase,
+                                   matched_phrase, line) < 0) return -1;
             ol->ops[ol->count++] = OP_LOOP_START;
             pending_multiplier = 1;
             last_simple_op = -1;
             i += consumed;
             continue;
         }
-        consumed = match_phrase(wl, i, kw_loop_end);
+        matched_phrase = NULL;
+        consumed = match_phrase_ex(wl, i, kw_loop_end, &matched_phrase);
         if (consumed && i + consumed <= end) {
+            int line = line_at(src, wl->positions[i]);
+            if (rep_check_and_push(&rep, matched_phrase,
+                                   matched_phrase, line) < 0) return -1;
             ol->ops[ol->count++] = OP_LOOP_END;
             pending_multiplier = 1;
             last_simple_op = -1;
@@ -516,10 +605,12 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
             const char *nxt = wl->words[i + 1];
             int is_simple = (strcmp(nxt, "\x01") == 0 ||
                              strcmp(nxt, "\x02") == 0 ||
+                             strcmp(nxt, "\x05") == 0 ||
                              match_single_word(nxt, kw_inc) ||
                              match_single_word(nxt, kw_dec) ||
                              match_single_word(nxt, kw_out) ||
-                             match_single_word(nxt, kw_in));
+                             match_single_word(nxt, kw_in) ||
+                             match_single_word(nxt, kw_newline));
             if (is_simple) {
                 pending_multiplier = adv;
                 i++;
@@ -531,12 +622,15 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
 
         // Single-word keywords (all multipliable).
         int kw_op = -1;
-        if (match_single_word(w, kw_inc))      kw_op = OP_INC;
-        else if (match_single_word(w, kw_dec)) kw_op = OP_DEC;
-        else if (match_single_word(w, kw_out)) kw_op = OP_OUT;
-        else if (match_single_word(w, kw_in))  kw_op = OP_IN;
+        if (match_single_word(w, kw_inc))           kw_op = OP_INC;
+        else if (match_single_word(w, kw_dec))      kw_op = OP_DEC;
+        else if (match_single_word(w, kw_out))      kw_op = OP_OUT;
+        else if (match_single_word(w, kw_in))       kw_op = OP_IN;
+        else if (match_single_word(w, kw_newline))  kw_op = OP_NEWLINE;
 
         if (kw_op >= 0) {
+            int line = line_at(src, wl->positions[i]);
+            if (rep_check_and_push(&rep, w, w, line) < 0) return -1;
             int post_consumed = 0;
             int mult = pending_multiplier *
                        peek_postfix_multiplier(wl, i, end, &post_consumed);
@@ -559,6 +653,95 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
         i++;
     }
     return 0;
+}
+
+// ── Forbidden definitive language ───────────────────────────
+// AI never commits. Words that express certainty or universal
+// claims (no, never, always, impossible, fact, definitely…) are
+// rejected. Intro and outro spans are excluded because mandatory
+// bookend phrases occasionally contain "never before has anyone
+// achieved such…" and the like.
+static int validate_forbidden_words(WordList *wl, int skip_start,
+                                    int skip_end, const char *src) {
+    int end = wl->count - skip_end;
+    for (int i = skip_start; i < end; i++) {
+        const char *w = wl->words[i];
+        if ((unsigned char)w[0] < 0x20) continue;  // pseudo-tokens
+        char lower[256];
+        str_to_lower(lower, w, sizeof(lower));
+        for (int j = 0; forbidden_words[j]; j++) {
+            char fw_lower[256];
+            str_to_lower(fw_lower, forbidden_words[j], sizeof(fw_lower));
+            if (strcmp(lower, fw_lower) == 0) {
+                int line = line_at(src, wl->positions[i]);
+                fprintf(stderr,
+                    "error: declarative tone detected at line %d "
+                    "(\"%s\").\n"
+                    "  AI never commits. Softened language is required:\n"
+                    "  \"perhaps\", \"tends to\", \"in many cases\", \"to\n"
+                    "  some extent\", \"depending on context\", \"it may\n"
+                    "  be that\". Avoid absolutes — every claim has a\n"
+                    "  caveat.\n", line, w);
+                return -1;
+            }
+        }
+    }
+    return 0;
+}
+
+// ── Hedging requirement ─────────────────────────────────────
+// Long programs (>= MIN_FILLER_FOR_HEDGE filler words) must contain
+// at least one canonical AI hedging phrase. Short programs are
+// exempt — terse responses don't need to hedge.
+static int validate_hedging(WordList *wl, int filler_count,
+                            int skip_start, int skip_end) {
+    if (filler_count < MIN_FILLER_FOR_HEDGE) return 0;
+    int end = wl->count - skip_end;
+    for (int i = skip_start; i < end; i++) {
+        for (int p = 0; hedging_phrases[p]; p++) {
+            char buf[512];
+            strncpy(buf, hedging_phrases[p], sizeof(buf) - 1);
+            buf[sizeof(buf) - 1] = '\0';
+
+            char *phrase_words[64];
+            int pw_count = 0;
+            char *tok = strtok(buf, " ");
+            while (tok && pw_count < 64) {
+                phrase_words[pw_count++] = tok;
+                tok = strtok(NULL, " ");
+            }
+            if (pw_count == 0 || i + pw_count > end) continue;
+
+            int matched = 1;
+            for (int j = 0; j < pw_count; j++) {
+                if ((unsigned char)wl->words[i + j][0] < 0x20) {
+                    matched = 0;
+                    break;
+                }
+                char w_lower[256], p_lower[256];
+                str_to_lower(w_lower, wl->words[i + j], sizeof(w_lower));
+                str_to_lower(p_lower, phrase_words[j], sizeof(p_lower));
+                if (strcmp(w_lower, p_lower) != 0) {
+                    matched = 0;
+                    break;
+                }
+            }
+            if (matched) return 0;
+        }
+    }
+
+    fprintf(stderr,
+        "error: long program lacks a hedging phrase\n"
+        "  Programs with %d+ filler words must hedge at least once.\n"
+        "  Real AI never commits to a sustained position — it always\n"
+        "  acknowledges complexity. Add one of:\n"
+        "    \"it depends\", \"there are nuances\", \"it's complex\",\n"
+        "    \"the answer is not straightforward\", \"in many cases\",\n"
+        "    \"depending on context\", \"on balance\", \"broadly\n"
+        "    speaking\", \"with the right approach\", \"all things\n"
+        "    considered\".\n",
+        MIN_FILLER_FOR_HEDGE);
+    return -1;
 }
 
 // ── Praise validation ───────────────────────────────────────
@@ -802,6 +985,9 @@ static int execute(OpList *ol) {
         case OP_STRING:
             fputs(ol->strings[ip], stdout);
             break;
+        case OP_NEWLINE:
+            putchar('\n');
+            break;
         }
         ip++;
     }
@@ -853,17 +1039,27 @@ int main(int argc, char **argv) {
     if (outro_consumed < 0)
         return 1;
 
-    // Compile (skip intro and outro spans)
+    // Forbidden definitive language check (outside intro/outro).
+    if (validate_forbidden_words(&wl, intro_consumed,
+                                 outro_consumed, src) != 0)
+        return 1;
+
+    // Compile (skip intro and outro spans; includes repetition check).
     OpList ol;
     char **filler_words = NULL;
     int filler_count = 0;
     int filler_cap = 0;
     if (compile(&wl, &ol, &filler_count, &filler_cap, &filler_words,
-                intro_consumed, outro_consumed) != 0)
+                intro_consumed, outro_consumed, src) != 0)
         return 1;
 
     // Validate praise
     if (validate_praise(filler_words, filler_count) != 0)
+        return 1;
+
+    // Validate hedging (long programs only).
+    if (validate_hedging(&wl, filler_count,
+                         intro_consumed, outro_consumed) != 0)
         return 1;
 
     // Validate brackets

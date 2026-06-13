@@ -92,7 +92,8 @@ class MultiplierTests(SlopfuckTest):
 
     def test_dual_multiplier_keyword_and_dash(self):
         # Postfix multiplier on em dash: "— five times" moves right 5.
-        body = "delve — five times delve tapestry"
+        # Use distinct inc verbs to avoid the repetition check.
+        body = "delve — five times foster tapestry"
         out, err, code = self.run_slop(make_program(body))
         self.assertEqual(code, 0, err)
         # Cell 0 = 1. Move right 5 → cell 5. Cell 5 += 1 = 1. Output 1.
@@ -171,11 +172,12 @@ class BulletMultiplierTests(SlopfuckTest):
 
     def test_bullet_repeats_em_dash(self):
         # — moves pointer right; bullet repeats it.
+        # Use distinct inc verbs to avoid the repetition check.
         body = (
             "delve\n"
             "—\n"
             "- bullet repeats em dash\n"
-            "delve\n"
+            "foster\n"
             "tapestry"
         )
         out, err, code = self.run_slop(make_program(body))
@@ -189,7 +191,7 @@ class BulletMultiplierTests(SlopfuckTest):
         body = (
             "delve twice "
             "it's worth noting that "
-            "- this bullet does nothing\n"
+            "- this bullet is harmless filler\n"
             "however "
             "this transcends "
             "tapestry"

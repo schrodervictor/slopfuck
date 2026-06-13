@@ -28,34 +28,10 @@ This prevents people from spamming `good good good` to pass the check
 and rewards real sycophantic creativity. Tier weights would live in a
 new `praise_tiers.h`.
 
-### A2. Repetition detection
-
-If the same keyword appears twice within N tokens, the compiler rejects
-the program:
-
-> `error: unnatural prose at line 12 ("delve" appears twice within 6
-> words). AI varies its vocabulary.`
-
-Implementation: sliding window over the token stream. N around 6–10.
-
-### A3. Forbidden definitive language
-
-Words like `no`, `wrong`, `impossible`, `always`, `never`, `fact`,
-`definitely` are syntax errors. AI never commits.
-
-> `error: declarative tone detected at line 4 ("impossible"). Softened
-> language is required ("perhaps", "tends to", "in many cases").`
-
 ### A4. Em dash density floor
 
 Minimum one em dash per 30 words of filler. Programs without enough em
 dashes are insufficiently typographically sophisticated.
-
-### A5. Hedging requirement
-
-Long programs must contain at least one hedging phrase from a curated
-list: `it depends`, `there are nuances`, `it's complex`, `the answer is
-not straightforward`, `it's worth considering both sides`.
 
 ### A6. Required "let me know" count
 
@@ -389,8 +365,7 @@ without Unicode input.
 2. **F3 ellipsis = repeat-3** — single line of tokenizer code
 3. **F4 `≈` hallucination op** — turns programs non-deterministic
 4. **F8 quote alternatives** — straight aliases for curly quotes
-5. **A2 repetition detection** — funniest single compile error
-6. **D1 sycophantic errors** — meta-joke that always lands
+5. **D1 sycophantic errors** — meta-joke that always lands
 
 **Biggest behavior change for one feature:**
 
