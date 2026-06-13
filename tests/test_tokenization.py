@@ -218,6 +218,88 @@ class SpecialCharacterTests(SlopfuckTest):
         self.assertEqual(out, "hi\n")
 
 
+# ── Reiterate (group repetition shortcut) ───────────────────────────
+
+
+class ReiterateTests(SlopfuckTest):
+    """`reiterate` re-emits the most recent string+newline block."""
+
+    def test_reiterate_alone_doubles_block(self):
+        # "Hello\n" → "Hello\nHello\n"
+        body = "“Hello”¶ reiterate"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "Hello\nHello\n")
+
+    def test_reiterate_with_postfix_multiplier(self):
+        # "Hello\n" + 2 extra copies = "Hello\n" * 3
+        body = "“Hello”¶ reiterate twice"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "Hello\nHello\nHello\n")
+
+    def test_reiterate_with_n_times(self):
+        # "Hi\n" + 4 extra copies = "Hi\n" * 5
+        body = "“Hi”¶ reiterate four times"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "Hi\n" * 5)
+
+    def test_reiterate_with_prefix_multiplier(self):
+        # No ¶ between the string and `thrice`, so the prefix
+        # multiplier binds to reiterate (not to ¶ as a postfix).
+        body = "“Hi” thrice reiterate"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        # thrice = 3 extra copies → 4 total "Hi"s.
+        self.assertEqual(out, "Hi" * 4)
+
+    def test_reiterate_string_only_no_newline(self):
+        # Block contains just the string (no trailing newline).
+        body = "“A” reiterate"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "AA")
+
+    def test_reiterate_multiple_strings_in_block(self):
+        # Two adjacent strings + newline = one contiguous block.
+        body = "“foo”“bar”¶ reiterate"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "foobar\nfoobar\n")
+
+    def test_reiterate_synonym(self):
+        # `echo` is in the kw_reiterate pool.
+        body = "“Hi”¶ echo"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "Hi\nHi\n")
+
+    def test_reiterate_stops_at_non_output_op(self):
+        # An increment op between two strings breaks the contiguous
+        # block; reiterate only re-emits the most recent string.
+        body = "“First”¶ delve “Second”¶ reiterate"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        # The block is just "Second\n"; reiterate emits "Second\n" once.
+        self.assertEqual(out, "First\nSecond\nSecond\n")
+
+    def test_reiterate_with_no_preceding_block_is_noop(self):
+        # No string or newline before reiterate → reiterate finds an
+        # empty block and emits nothing. Should compile and produce
+        # nothing.
+        body = "reiterate twice"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "")
+
+    def test_reiterate_case_insensitive(self):
+        body = "“Hi”¶ REITERATE"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "Hi\nHi\n")
+
+
 # ── Keyword matching ────────────────────────────────────────────────
 
 

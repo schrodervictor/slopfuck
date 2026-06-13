@@ -610,7 +610,8 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
                              match_single_word(nxt, kw_dec) ||
                              match_single_word(nxt, kw_out) ||
                              match_single_word(nxt, kw_in) ||
-                             match_single_word(nxt, kw_newline));
+                             match_single_word(nxt, kw_newline) ||
+                             match_single_word(nxt, kw_reiterate));
             if (is_simple) {
                 pending_multiplier = adv;
                 i++;
@@ -636,6 +637,52 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
                        peek_postfix_multiplier(wl, i, end, &post_consumed);
             if (emit_op_n(ol, kw_op, mult) < 0) return -1;
             last_simple_op = kw_op;
+            pending_multiplier = 1;
+            i += 1 + post_consumed;
+            continue;
+        }
+
+        // Reiterate — compile-time expansion. Looks back through the
+        // most recent contiguous block of OP_STRING and OP_NEWLINE
+        // ops and emits `mult` extra copies. Multipliable in the usual
+        // postfix form (`reiterate twice`) and prefix form (`twice
+        // reiterate`). Not bullet-repeatable (bullets reset
+        // last_simple_op to -1 after a reiterate).
+        if (match_single_word(w, kw_reiterate)) {
+            int line = line_at(src, wl->positions[i]);
+            if (rep_check_and_push(&rep, w, w, line) < 0) return -1;
+            int post_consumed = 0;
+            int mult = pending_multiplier *
+                       peek_postfix_multiplier(wl, i, end, &post_consumed);
+            // Find the most recent contiguous string/newline block.
+            int block_end = ol->count;
+            int block_start = block_end;
+            while (block_start > 0 &&
+                   (ol->ops[block_start - 1] == OP_STRING ||
+                    ol->ops[block_start - 1] == OP_NEWLINE)) {
+                block_start--;
+            }
+            int block_len = block_end - block_start;
+            // Emit `mult` extra copies of the block.
+            for (int k = 0; k < mult; k++) {
+                for (int j = 0; j < block_len; j++) {
+                    if (ol->count >= MAX_OPS) {
+                        fprintf(stderr,
+                            "error: program too large (max %d ops)\n",
+                            MAX_OPS);
+                        return -1;
+                    }
+                    int src_idx = block_start + j;
+                    ol->ops[ol->count] = ol->ops[src_idx];
+                    if (ol->ops[src_idx] == OP_STRING &&
+                        ol->strings[src_idx]) {
+                        ol->strings[ol->count] =
+                            strdup(ol->strings[src_idx]);
+                    }
+                    ol->count++;
+                }
+            }
+            last_simple_op = -1;
             pending_multiplier = 1;
             i += 1 + post_consumed;
             continue;

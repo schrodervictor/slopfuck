@@ -1318,9 +1318,34 @@ static const char *kw_newline[] = {
     NULL
 };
 
+// ── REITERATE (group repetition shortcut) ───────────────────
+// Re-emits the most recent contiguous run of OP_STRING + OP_NEWLINE
+// ops. AI prose loves verbs that mean "say it again"; reiterate is
+// the canonical choice. Multipliable: `reiterate twice` emits 2
+// extra copies of the block; `reiterate` alone emits 1.
+//
+// Compile-time expansion only. No runtime opcode; the compile pass
+// looks back through the op stream and appends copies.
+static const char *kw_reiterate[] = {
+    "reiterate",
+    "restate",
+    "echo",
+    "repeat",
+    "recapitulate",
+    "requote",
+    "redeliver",
+    "reaffirm",
+    "reprise",
+    "recite",
+    "rehearse",
+    "redux",
+    "replay",
+    NULL
+};
+
 // ── Counts (computed at init) ───────────────────────────────
 // We store these so we don't recount every lookup.
-#define KW_POOL_COUNT 7
+#define KW_POOL_COUNT 8
 
 typedef struct {
     const char **words;

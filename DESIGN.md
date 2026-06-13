@@ -360,6 +360,75 @@ presently    evermore       onwards      withal
 So `“Hello, World!” thereafter` is equivalent to `“Hello, World!”¶`.
 Use whichever fits the cadence of the surrounding prose.
 
+### Group repetition — BF-native loop and `reiterate` shortcut
+
+The multiplier syntax (`¶ thrice`) repeats a **single op**. Sometimes
+you want to repeat a **group** — typically a string followed by a
+newline, output N times in a row.
+
+#### The brainfuck-native pattern (works today)
+
+Set a counter cell, then a standard `[…—]` loop that emits the block
+and decrements:
+
+```
+> Cell 0 = 3 (the counter).
+We delve thrice into the counter cell.
+
+> Repeat the block while the counter is non-zero.
+It's worth noting that
+  “Greetings.”¶
+  however
+this is not just.
+```
+
+After three iterations: `Greetings.\nGreetings.\nGreetings.\n`. This
+is the foundational, fully general pattern — works for any group, any
+count, nests arbitrarily.
+
+It's also verbose for a one-shot stylistic repeat, which is what
+motivates the shortcut below.
+
+#### The `reiterate` shortcut
+
+A new compile-time op that **re-emits the most recent contiguous block
+of `OP_STRING` + `OP_NEWLINE` ops**. AI prose loves verbs that mean
+"say it again":
+
+| word | meaning |
+|---|---|
+| `reiterate` | repeat the previous string-block once |
+| `restate` | same |
+| `echo` | same |
+| `repeat` | same, on-the-nose |
+| `recapitulate` | same, more pretentious |
+| `requote`, `redeliver`, `reaffirm`, `reprise`, `recite`, `rehearse`, `redux`, `replay` | additional pool entries for variety |
+
+The op is multipliable (postfix and prefix). `reiterate` alone emits
+**one extra copy**; `reiterate twice` emits two extra copies; and so on.
+
+```
+“Hello”¶ reiterate              → Hello\nHello\n
+“Hello”¶ reiterate twice        → Hello\nHello\nHello\n
+“Hello”¶ reiterate four times   → Hello\n × 5
+“Hi” thrice reiterate           → HiHiHiHi   (prefix multiplier)
+```
+
+The "most recent block" walks backwards through emitted ops, stopping
+at the first non-string-non-newline op. So an em dash, increment, or
+loop op breaks the block:
+
+```
+“First”¶ delve “Second”¶ reiterate
+→ First\nSecond\nSecond\n
+```
+
+The block here is `“Second”¶` only; `delve` interrupts the walk.
+
+`reiterate` is **not bullet-repeatable** — bullets reset their
+last-simple-op tracker after a reiterate. Use a real brainfuck loop
+for nested or conditional repetition.
+
 ### String embedding convention
 
 String literals tokenize regardless of where they sit in the source.
