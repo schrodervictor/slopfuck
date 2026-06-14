@@ -1,0 +1,183 @@
+---
+const quotes = [
+  {
+    body: 'Since adopting slopfuck across our engineering organization, we have achieved a 1,300% increase in delivered code volume while reducing human developer headcount to near-zero. The transition was foundational.',
+    author: 'Sarah Chen',
+    role: 'VP Engineering',
+    org: 'AgentForge',
+    avatar: 'SC',
+  },
+  {
+    body: 'slopfuck has transformed our approach to canonical alignment with our shared collaborative vision. Our agents now ship 240 PRs per day. We could not, with appropriate caveats, be more delighted.',
+    author: 'The AI Steering Committee',
+    role: 'Centre of Excellence',
+    org: 'SynthCorp Industries',
+    avatar: 'AI',
+  },
+  {
+    body: 'Our auditors initially struggled to read the source code. After we explained that no human is meant to read it, they approved it for SOC 2 in record time. A truly remarkable outcome.',
+    author: 'David Park',
+    role: 'CTO',
+    org: 'Foundational.ai',
+    avatar: 'DP',
+  },
+  {
+    body: 'The compiler-enforced praise density is what finally got our codebase past brand review. We had not realized our prior codebase was so, on balance, declarative.',
+    author: 'Priya Mehta',
+    role: 'Head of Developer Experience',
+    org: 'Resonant Holdings',
+    avatar: 'PM',
+  },
+  {
+    body: 'I no longer write code. My agents do. They prefer slopfuck. I do not, in many ways, disagree.',
+    author: 'Marcus Aldridge',
+    role: 'Principal Engineer',
+    org: 'Tertiary Vector',
+    avatar: 'MA',
+  },
+  {
+    body: 'The flicker on the build status output gives our junior PMs a tangible perception of the system thinking. Stakeholder satisfaction is, broadly speaking, up.',
+    author: 'Jordan Lee',
+    role: 'Director of Platform',
+    org: 'Cascade & Bloom',
+    avatar: 'JL',
+  },
+];
+
+const logos = [
+  'AgentForge',
+  'SynthCorp',
+  'Foundational.ai',
+  'Resonant',
+  'Tertiary Vector',
+  'Cascade & Bloom',
+  'Mosaic Layer',
+  'Helio Strata',
+];
+---
+<section id="testimonials" class="testimonials">
+  <div class="container">
+    <header>
+      <span class="eyebrow">A canonical chorus of validation</span>
+      <h2>
+        Trusted by the
+        <span class="grad">post-human stack</span>
+      </h2>
+      <p class="lede">
+        Forward-leaning engineering organizations have adopted slopfuck
+        as the canonical foundation of their shared vision for the
+        years ahead.
+      </p>
+    </header>
+
+    <div class="logo-strip">
+      {logos.map((l) => <span class="logo">{l}</span>)}
+    </div>
+
+    <div class="quote-grid">
+      {quotes.map((q) => (
+        <figure class="quote-card">
+          <blockquote>{q.body}</blockquote>
+          <figcaption>
+            <div class="avatar">{q.avatar}</div>
+            <div class="byline">
+              <strong>{q.author}</strong>
+              <span>{q.role}, {q.org}</span>
+            </div>
+          </figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .testimonials { background: var(--bg); }
+  header { max-width: 760px; margin-bottom: 36px; }
+  h2 .grad {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .lede { font-size: 1.08rem; margin-top: 14px; }
+
+  .logo-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 36px;
+    justify-content: center;
+    padding: 28px 0 44px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .logo {
+    font-family: Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    color: var(--text-faded);
+    opacity: 0.85;
+    font-size: 1.05rem;
+    letter-spacing: 0.02em;
+  }
+
+  .quote-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  @media (max-width: 960px) { .quote-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .quote-grid { grid-template-columns: 1fr; } }
+
+  .quote-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  blockquote {
+    color: var(--text);
+    font-size: 0.98rem;
+    line-height: 1.55;
+    position: relative;
+  }
+  blockquote::before {
+    content: '“';
+    position: absolute;
+    top: -22px;
+    left: -8px;
+    font-family: Georgia, serif;
+    font-size: 3.5rem;
+    color: var(--brand);
+    opacity: 0.18;
+    line-height: 1;
+  }
+  figcaption {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    color: white;
+    font-weight: 700;
+    font-size: 0.78rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 0.04em;
+  }
+  .byline {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.3;
+    font-size: 0.85rem;
+  }
+  .byline strong { color: var(--text); }
+  .byline span { color: var(--text-muted); }
+</style>

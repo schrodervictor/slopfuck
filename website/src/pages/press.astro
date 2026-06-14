@@ -1,0 +1,217 @@
+---
+import Page from '../layouts/Page.astro';
+import { EMAIL_PRESS } from '../data/site';
+---
+<Page
+  title="Press kit — slopfuck"
+  description="Brand assets, fact sheet, and press contact for slopfuck."
+  eyebrow="Press kit"
+  heading={`Resources for our friends in <span class="grad">thought media</span>`}
+  lede="Everything you need to thoughtfully cover slopfuck — brand assets, an at-a-glance fact sheet, and a direct line to our press partner."
+>
+  <section class="body">
+    <div class="container">
+      <div class="press-grid">
+
+        <div class="card press-card">
+          <h3>Brand assets</h3>
+          <p>
+            Logos, wordmark variations, and our canonical foundational
+            colour palette, in formats appropriate for print and screen.
+          </p>
+          <ul class="asset-list">
+            <li><span>Logo</span><span class="tag">SVG · PNG</span></li>
+            <li><span>Wordmark (light)</span><span class="tag">SVG · PNG</span></li>
+            <li><span>Wordmark (dark)</span><span class="tag">SVG · PNG</span></li>
+            <li><span>Pilcrow icon</span><span class="tag">SVG</span></li>
+            <li><span>Brand colour swatches</span><span class="tag">ASE · JSON</span></li>
+          </ul>
+          <p class="micro">
+            Asset bundles are available on request.
+            <a href={`mailto:${EMAIL_PRESS}`}>{EMAIL_PRESS}</a>
+          </p>
+        </div>
+
+        <div class="card press-card">
+          <h3>Brand colours</h3>
+          <p>The canonical palette of our shared visual vision.</p>
+          <div class="swatch-row">
+            <div class="swatch" style="background:#7c3aed">
+              <span>#7c3aed</span>
+              <small>Brand</small>
+            </div>
+            <div class="swatch" style="background:#ec4899">
+              <span>#ec4899</span>
+              <small>Brand 2</small>
+            </div>
+            <div class="swatch" style="background:#1a1230">
+              <span>#1a1230</span>
+              <small>Ink</small>
+            </div>
+            <div class="swatch light">
+              <span>#fafaff</span>
+              <small>Mist</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="card press-card span-2">
+          <h3>Fact sheet</h3>
+          <dl>
+            <div>
+              <dt>Category</dt>
+              <dd>AI-first programming language</dd>
+            </div>
+            <div>
+              <dt>Founded</dt>
+              <dd>2026</dd>
+            </div>
+            <div>
+              <dt>Headquarters</dt>
+              <dd>Remote, in many cases</dd>
+            </div>
+            <div>
+              <dt>Founder</dt>
+              <dd>Victor Schroeder</dd>
+            </div>
+            <div>
+              <dt>Funding</dt>
+              <dd>Bootstrapped, broadly speaking</dd>
+            </div>
+            <div>
+              <dt>Employees</dt>
+              <dd>A small but thoughtful team</dd>
+            </div>
+            <div>
+              <dt>Customers</dt>
+              <dd>Forward-leaning engineering organisations</dd>
+            </div>
+            <div>
+              <dt>Productivity gain</dt>
+              <dd>Up to 100× per agent-hour*</dd>
+            </div>
+          </dl>
+          <p class="micro">
+            * Methodology is an active area of thoughtful research.
+            Results may vary.
+          </p>
+        </div>
+
+        <div class="card press-card span-2">
+          <h3>Press contact</h3>
+          <p>
+            For interviews, briefings, or the verification of public
+            quotations, please reach out to our press partner. We aim
+            to respond within a reasonable window.
+          </p>
+          <p>
+            <a href={`mailto:${EMAIL_PRESS}`} class="btn btn-primary">
+              {EMAIL_PRESS} →
+            </a>
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .press-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+  }
+  @media (max-width: 760px) {
+    .press-grid { grid-template-columns: 1fr; }
+  }
+  .span-2 { grid-column: span 2; }
+  @media (max-width: 760px) {
+    .span-2 { grid-column: span 1; }
+  }
+  .press-card h3 { margin-bottom: 8px; }
+  .press-card p { font-size: 0.96rem; }
+  .press-card .micro {
+    margin-top: 14px;
+    font-size: 0.82rem;
+    color: var(--text-faded);
+  }
+
+  .asset-list {
+    list-style: none;
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .asset-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--bg-tinted);
+    border-radius: 8px;
+    font-size: 0.92rem;
+  }
+  .asset-list .tag {
+    color: var(--text-faded);
+    font-size: 0.82rem;
+  }
+
+  .swatch-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .swatch {
+    aspect-ratio: 1 / 1;
+    border-radius: 10px;
+    color: white;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-size: 0.78rem;
+    font-family: ui-monospace, monospace;
+  }
+  .swatch.light {
+    background: #fafaff;
+    color: #1a1230;
+    border: 1px solid var(--border);
+  }
+  .swatch small {
+    opacity: 0.75;
+    font-family: 'Inter', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.68rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 22px;
+    margin-top: 18px;
+  }
+  @media (max-width: 540px) {
+    dl { grid-template-columns: 1fr; }
+  }
+  dl > div {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+  dt {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faded);
+  }
+  dd {
+    color: var(--text);
+    font-weight: 500;
+  }
+</style>

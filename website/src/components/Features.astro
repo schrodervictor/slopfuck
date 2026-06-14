@@ -1,0 +1,129 @@
+---
+const features = [
+  {
+    icon: '🛡',
+    title: 'Mandatory Sycophancy Compilation',
+    body: 'The compiler refuses to compile programs that fail to sufficiently flatter the user. Eliminate brand-unsafe code at the syntax level — programs that fall below the configurable praise-density threshold cannot enter your codebase.',
+  },
+  {
+    icon: '⛔',
+    title: 'Banned Declarative Language',
+    body: 'Words like wrong, impossible, fact, and always are syntax errors. Eliminate over-confident assertions across your entire repository. Every claim hedges by construction.',
+  },
+  {
+    icon: '📚',
+    title: '1,200+ Keyword Synonyms',
+    body: 'Over 200 ways to increment a single variable, drawn from boardroom, gym, monastery, and seminar. Vocabulary monotony is rejected by the compiler — your code will read as a freshly generated thought-leadership essay every time.',
+  },
+  {
+    icon: '🤝',
+    title: 'Mandatory Hedging Requirement',
+    body: 'Long programs must contain at least one canonical AI hedging phrase ("it depends", "in many cases", "broadly speaking"). Stay aligned with industry-standard non-commitment patterns.',
+  },
+  {
+    icon: '✨',
+    title: 'Unicode-First Syntax',
+    body: 'Em dashes, curly quotes, and the pilcrow are first-class syntax. Straight quotes are a compile error. Typographically correct source from day zero — no migration required.',
+  },
+  {
+    icon: '🧠',
+    title: 'Compiler Flicker Visibility',
+    body: 'The compiler renders status output with a brief flicker on TTY, like an LLM streaming a response. Watch the build think — observability becomes a perceptual experience, not a dashboard query.',
+  },
+  {
+    icon: '📝',
+    title: 'Required Sycophantic Bookends',
+    body: 'Every program must begin with a sycophantic opener and end with a call-to-action upsell. Source code that is brand-consistent with your marketing voice across the entire artifact lifecycle.',
+  },
+  {
+    icon: '🔁',
+    title: 'Compile-Time Group Repetition',
+    body: 'Reiterate, restate, recapitulate, or echo any output block with native compile-time expansion. AI agents naturally reach for these patterns — the compiler understands.',
+  },
+  {
+    icon: '🚧',
+    title: 'Prose Repetition Detection',
+    body: 'Repeating a keyword within 6 tokens is a syntax error. Forces the agent to traverse the full vocabulary, which raises perceived sophistication scores in human stakeholder reviews by 340%.',
+  },
+];
+---
+<section id="features" class="features">
+  <div class="container">
+    <header class="features-header">
+      <span class="eyebrow">A canonical foundation for AI-first delivery</span>
+      <h2>
+        Every feature your AI agents
+        <span class="grad">already wanted</span>
+      </h2>
+      <p class="lede">
+        slopfuck doesn't ask your agents to compromise on register. It
+        meets them where they already write — in a register that, in
+        many cases, is broadly considered the canonical foundation of
+        post-human software.
+      </p>
+    </header>
+
+    <div class="feature-grid">
+      {features.map((f) => (
+        <div class="card feature-card">
+          <div class="icon">{f.icon}</div>
+          <h3>{f.title}</h3>
+          <p>{f.body}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .features {
+    background: var(--bg);
+  }
+  .features-header {
+    max-width: 760px;
+    margin-bottom: 56px;
+  }
+  h2 .grad {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .lede {
+    font-size: 1.08rem;
+    margin-top: 14px;
+  }
+  .feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+  }
+  @media (max-width: 960px) {
+    .feature-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 640px) {
+    .feature-grid { grid-template-columns: 1fr; }
+  }
+  .feature-card {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--bg-tinted);
+    border-radius: 12px;
+    font-size: 1.3rem;
+  }
+  .feature-card h3 {
+    font-size: 1.08rem;
+    line-height: 1.3;
+  }
+  .feature-card p {
+    font-size: 0.94rem;
+  }
+</style>

@@ -1,0 +1,83 @@
+---
+import { GITHUB_REPO } from '../data/site';
+---
+<section class="cta">
+  <div class="container">
+    <div class="cta-card">
+      <h2>
+        Ready to delve into
+        <span class="grad">the canonical foundation</span>
+        of our shared vision?
+      </h2>
+      <p>
+        Your AI agents are, broadly speaking, already prepared. Give
+        them a language designed for the work they have, in many
+        cases, already been doing.
+      </p>
+      <div class="cta-actions">
+        <a href="/#features" class="btn btn-primary">
+          Explore the foundational pillars
+        </a>
+        <a href={GITHUB_REPO} class="btn btn-secondary">
+          View source on GitHub
+        </a>
+      </div>
+      <p class="micro">
+        No credit card required. No human ergonomics promised.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta { background: var(--bg); }
+  .cta-card {
+    background:
+      radial-gradient(ellipse at top right, rgba(236, 72, 153, 0.25), transparent 60%),
+      radial-gradient(ellipse at bottom left, rgba(124, 58, 237, 0.30), transparent 60%),
+      linear-gradient(135deg, #1a1230 0%, #3b1a6f 100%);
+    color: white;
+    border-radius: var(--radius-lg);
+    padding: clamp(40px, 6vw, 72px);
+    text-align: center;
+    box-shadow: 0 24px 60px rgba(36, 12, 91, 0.25);
+  }
+  .cta-card h2 {
+    color: white;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .cta-card h2 .grad {
+    background: linear-gradient(135deg, #fbcfe8 0%, #c4b5fd 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .cta-card p {
+    color: #d4cef0;
+    font-size: 1.1rem;
+    max-width: 620px;
+    margin: 18px auto 0;
+  }
+  .cta-actions {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 30px;
+    justify-content: center;
+  }
+  .cta-card .btn-secondary {
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+  .cta-card .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: white;
+  }
+  .micro {
+    margin-top: 22px;
+    font-size: 0.82rem;
+    color: #b9b1d6;
+  }
+</style>

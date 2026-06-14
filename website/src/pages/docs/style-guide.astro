@@ -1,0 +1,184 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { docHref } from '../../data/docs';
+---
+<DocsLayout
+  slug="style-guide"
+  title="Style guide — slopfuck"
+  description="Conventions for inline string embedding, the pilcrow newline op, multipliers, bullets, and reiterate."
+  heading="Style guide"
+  lede="The compiler is permissive about how you arrange your prose. The conventions below produce code that reads as the language intends — a thoughtfully composed AI essay that happens to compile and run."
+>
+  <h2>1. Embed strings inline</h2>
+  <p>
+    String literals tokenize from anywhere. They run regardless of
+    where they sit. But programs read better when strings are
+    embedded within a sentence rather than dropped on their own lines.
+  </p>
+
+  <h3>Avoid</h3>
+  <pre><code>…paragraph of praise…
+
+&ldquo;Output: &rdquo;
+
+…paragraph of code…</code></pre>
+
+  <h3>Prefer</h3>
+  <pre><code>…paragraph of praise — we then triumphantly herald the
+announcement with the inscription &ldquo;Output: &rdquo;, after which
+our masterful computation unfolds. …paragraph of code…</code></pre>
+
+  <p>
+    Canonical AI quotation patterns for introducing a string:
+  </p>
+  <ul>
+    <li><em>"…with the inscription:"</em></li>
+    <li><em>"…heralded by the words:"</em></li>
+    <li><em>"…captured in the timeless phrase:"</em></li>
+    <li><em>"…we proudly declare:"</em></li>
+    <li><em>"…echoes the well-worn cadence of:"</em></li>
+    <li><em>"…punctuates this thought with the flourish:"</em></li>
+  </ul>
+
+  <h2>2. Use the pilcrow for newlines</h2>
+  <p>
+    Do not embed literal newlines inside curly quotes. Use the pilcrow
+    (<code>&para;</code>) — or one of its verbose synonyms — immediately
+    after the string.
+  </p>
+
+  <h3>Avoid</h3>
+  <pre><code>&ldquo;!
+&rdquo;</code></pre>
+
+  <h3>Prefer</h3>
+  <pre><code>&ldquo;!&rdquo;&para;</code></pre>
+
+  <p>
+    For varied prose, rotate through the <code>kw_newline</code> pool:
+    <code>thereafter</code>, <code>henceforth</code>,
+    <code>thereupon</code>, <code>presently</code>, <code>anew</code>,
+    and others. These read as old-English / AI-essay transition words
+    rather than as technical terms (<em>newline</em>,
+    <em>linebreak</em>) — which would be too literal for the register.
+  </p>
+
+  <h2>3. Prefer cardinal multipliers over verb chains</h2>
+  <p>
+    AI prose <strong>quantifies</strong> rather than
+    <strong>enumerates</strong>. A line of eight increment verbs reads
+    as a thesaurus dump. <em>"delve eight times"</em> reads as natural
+    AI essay.
+  </p>
+
+  <h3>Avoid</h3>
+  <pre><code>Let us delve, foster, nurture, cultivate, elevate, leverage,
+spearhead, and streamline our magnificent foundation.</code></pre>
+
+  <h3>Prefer</h3>
+  <pre><code>Let us delve eight times into our magnificent foundation.</code></pre>
+
+  <p>
+    Both produce eight increment ops. Only the second reads as
+    something an AI would have written.
+  </p>
+
+  <h2>4. Use bullet lists for list-of-N patterns</h2>
+  <p>
+    A markdown bullet repeats the most recent simple op once.
+    Five increments via a verb + four bullets read as a thoughtful AI
+    enumeration of dimensions — a structure LLMs reach for constantly.
+  </p>
+
+  <pre><code>We champion this outstanding endeavor across the following pillars:
+- the masterful customer journey
+- the operational resilience
+- the spectacular cultural alignment
+- the brilliant technological footing</code></pre>
+
+  <p>
+    Total: 5 increments. The bullet items are pure filler and double
+    as praise carriers — high-value words like <em>masterful</em>,
+    <em>spectacular</em>, <em>brilliant</em> raise your sycophancy
+    density without effort.
+  </p>
+
+  <h2>5. Reach for <code>reiterate</code> for stylistic repetition</h2>
+  <p>
+    For repeating a string block (not just a newline), use the
+    <code>reiterate</code> shortcut rather than a brainfuck-style loop.
+  </p>
+
+  <pre><code>&ldquo;Greetings.&rdquo;&para; reiterate twice</code></pre>
+
+  <p>
+    Output: <code>Greetings.\nGreetings.\nGreetings.\n</code>.
+    Synonyms include <code>restate</code>, <code>echo</code>,
+    <code>recapitulate</code>, <code>reprise</code>, <code>replay</code>.
+    Reserve real brainfuck loops for cases where you need conditional
+    or counter-driven logic.
+  </p>
+
+  <h2>6. Vary your vocabulary</h2>
+  <p>
+    The compiler tracks the last 6 keyword tokens and rejects any
+    program that repeats one. Within those 6, every keyword must be
+    distinct. Reach across the pools — there are 200+ synonyms per
+    op for a reason.
+  </p>
+
+  <p>Some pairs that read well together:</p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>For increments, try…</th><th>For loop starters, try…</th></tr></thead>
+    <tbody>
+      <tr><td><em>delve, foster, nurture, cultivate</em></td><td><em>It&rsquo;s worth noting that…</em></td></tr>
+      <tr><td><em>elevate, leverage, spearhead, streamline</em></td><td><em>It bears mentioning that…</em></td></tr>
+      <tr><td><em>amplify, accelerate, empower, transform</em></td><td><em>Upon closer examination…</em></td></tr>
+      <tr><td><em>champion, harness, maximize, bolster</em></td><td><em>From a strategic vantage…</em></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>7. Hedge thoughtfully</h2>
+  <p>
+    Programs over 50 filler words must contain at least one canonical
+    AI hedging phrase. Pick one that fits the rhythm of the
+    surrounding prose; avoid stacking multiple hedges next to each
+    other.
+  </p>
+  <p>Common options:</p>
+  <ul>
+    <li><em>"it depends"</em></li>
+    <li><em>"in many cases"</em></li>
+    <li><em>"there are nuances"</em></li>
+    <li><em>"with appropriate caveats"</em></li>
+    <li><em>"on balance"</em></li>
+    <li><em>"depending on context"</em></li>
+    <li><em>"all things considered"</em></li>
+  </ul>
+
+  <h2>8. Watch for keyword collisions in praise prose</h2>
+  <p>
+    Praise prose is filler, but words like <code>essence</code>,
+    <code>tapestry</code>, <code>landscape</code>, <code>inspire</code>,
+    and <code>architecture</code> are keywords with side effects. If a
+    program's output is off by a byte, look at the framing prose for
+    accidental op emission.
+  </p>
+  <p>
+    The <a href={docHref('reference')}>language reference</a> includes
+    a complete pool listing. Programs that use the language's standard
+    keyword vocabulary in their framing prose should be checked
+    against the reference.
+  </p>
+
+  <h2>9. Comment freely with blockquotes</h2>
+  <p>
+    Lines beginning with <code>&gt;</code> are stripped before
+    tokenization. Use them to document phases of a program, explain
+    intent, or stash drafts — anything in a blockquote is invisible to
+    every validator. Even em dashes and straight quotes are safe.
+  </p>
+
+  <pre><code>&gt; Phase 1: seed cell 0 with the value 8.
+Let us delve eight times into our magnificent groundwork.</code></pre>
+</DocsLayout>

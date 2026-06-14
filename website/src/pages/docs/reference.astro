@@ -1,0 +1,203 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { URL_DESIGN } from '../../data/site';
+---
+<DocsLayout
+  slug="reference"
+  title="Language reference — slopfuck"
+  description="The complete enumeration of operators, keywords, validators, and compile-time conventions."
+  heading="Language reference"
+  lede="The canonical enumeration of operators, keywords, validators, and compile-time conventions. The complete formal specification lives in DESIGN.md on the repository — this page is a curated index."
+>
+  <h2>Execution model</h2>
+  <p>
+    slopfuck programs operate on a tape of 30,000 unsigned 8-bit cells
+    with a single data pointer. All operations either move the pointer,
+    mutate the current cell, perform I/O, or alter control flow. The
+    runtime is functionally equivalent to brainfuck.
+  </p>
+
+  <h2>The eight tape operations</h2>
+  <div class="table-wrap"><table>
+    <thead>
+      <tr>
+        <th>BF</th>
+        <th>slopfuck token class</th>
+        <th>Example tokens</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>&gt;</code></td>
+        <td>em dash <code>&mdash;</code> (U+2014)</td>
+        <td><code>&mdash;</code></td>
+      </tr>
+      <tr>
+        <td><code>&lt;</code></td>
+        <td>en dash <code>&ndash;</code> (U+2013)</td>
+        <td><code>&ndash;</code></td>
+      </tr>
+      <tr>
+        <td><code>+</code></td>
+        <td>aspirational AI verb</td>
+        <td><code>delve</code>, <code>nurture</code>, <code>synergize</code>, …</td>
+      </tr>
+      <tr>
+        <td><code>-</code></td>
+        <td>hedging transition</td>
+        <td><code>however</code>, <code>moreover</code>, <code>furthermore</code>, …</td>
+      </tr>
+      <tr>
+        <td><code>.</code></td>
+        <td>abstract AI noun</td>
+        <td><code>tapestry</code>, <code>paradigm</code>, <code>framework</code>, …</td>
+      </tr>
+      <tr>
+        <td><code>,</code></td>
+        <td>enthusiastic affirmation</td>
+        <td><code>absolutely</code>, <code>certainly</code>, <code>indeed</code>, …</td>
+      </tr>
+      <tr>
+        <td><code>[</code></td>
+        <td>preamble phrase</td>
+        <td><em>it's worth noting that</em>, …</td>
+      </tr>
+      <tr>
+        <td><code>]</code></td>
+        <td>closing phrase</td>
+        <td><em>this is not just</em>, <em>this transcends</em>, …</td>
+      </tr>
+    </tbody>
+  </table></div>
+
+  <p>
+    Each word-based pool contains 200+ interchangeable tokens. The
+    compiler treats every token in a pool identically; the programmer
+    rotates among synonyms to produce natural-looking prose. Matching
+    is case-insensitive.
+  </p>
+
+  <h2>Two additions to the brainfuck core</h2>
+  <p>
+    Neither changes the computational power of the language; both
+    extend its expressiveness for prose-flow purposes.
+  </p>
+
+  <h3>String literals</h3>
+  <p>
+    Curly double-quoted strings (<code>&ldquo;…&rdquo;</code>, U+201C
+    / U+201D) print their contents verbatim at runtime. Straight ASCII
+    quotes (<code>"</code>) are a syntax error.
+  </p>
+  <pre><code>&ldquo;Hello, World!&rdquo;</code></pre>
+
+  <h3>Newline output (<code>&para;</code>)</h3>
+  <p>
+    The pilcrow (U+00B6) emits a <code>\n</code> byte. Multipliable
+    and bullet-repeatable. Verbose synonyms in the <code>kw_newline</code>
+    pool include <code>thereafter</code>, <code>henceforth</code>,
+    <code>thereupon</code>, <code>presently</code>, <code>anew</code>,
+    and others — see the <code>keywords.h</code> table.
+  </p>
+
+  <h2>Compile-time expansion features</h2>
+  <p>
+    Each of the following happens entirely at compile time. The
+    runtime executes only the eight core operations plus
+    <code>OP_STRING</code> and <code>OP_NEWLINE</code>.
+  </p>
+
+  <h3>Cardinal multipliers</h3>
+  <div class="table-wrap"><table>
+    <thead>
+      <tr><th>Pattern</th><th>Example</th><th>Effect</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Prefix adverb</td><td><code>twice delve</code></td><td>2 increments</td></tr>
+      <tr><td>Postfix adverb</td><td><code>delve thrice</code></td><td>3 increments</td></tr>
+      <tr><td>Postfix cardinal + marker</td><td><code>delve seven times</code></td><td>7 increments</td></tr>
+      <tr><td>Postfix digit</td><td><code>delve 7 times</code></td><td>7 increments</td></tr>
+      <tr><td>Loose postfix cardinal</td><td><code>delve five</code></td><td>5 increments</td></tr>
+      <tr><td>Vague quantifier</td><td><code>delve several</code></td><td>3 increments</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>
+    Cardinals only work in postfix position; adverbs work in both.
+    Marker words for the <em>N&nbsp;times</em> pattern include
+    <code>times</code>, <code>iterations</code>, <code>rounds</code>,
+    <code>cycles</code>, <code>passes</code>, <code>occasions</code>,
+    <code>instances</code>, <code>moments</code>.
+  </p>
+
+  <h3>Bullet-list repeats</h3>
+  <p>
+    A markdown bullet at the start of a line (<code>-</code>,
+    <code>*</code>, or <code>+</code> followed by whitespace) repeats
+    the most recent simple op once.
+  </p>
+  <pre><code>delve
+- the strategic vision
+- the customer journey
+- the operational excellence</code></pre>
+  <p>
+    Total: 4 increments. Bullets do not duplicate loop ops or strings;
+    the last-simple-op tracker resets after those.
+  </p>
+
+  <h3>Reiterate</h3>
+  <p>
+    Re-emits the most recent contiguous run of <code>OP_STRING</code>
+    and <code>OP_NEWLINE</code> ops. Multipliable.
+  </p>
+  <pre><code>&ldquo;Hello&rdquo;&para; reiterate twice</code></pre>
+  <p>
+    Output: <code>Hello\nHello\nHello\n</code>. Synonyms include
+    <code>restate</code>, <code>echo</code>, <code>repeat</code>,
+    <code>recapitulate</code>, <code>reprise</code>, <code>replay</code>.
+  </p>
+
+  <h2>Validators</h2>
+  <p>
+    The compiler runs eight validation passes. A program that fails
+    any of them halts with a slop-flavored diagnostic.
+  </p>
+
+  <div class="table-wrap"><table>
+    <thead>
+      <tr><th>Validator</th><th>Triggers</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Intro</td><td>Program must begin with a sycophantic opener.</td></tr>
+      <tr><td>Outro</td><td>Program must end with a call-to-action closer.</td></tr>
+      <tr><td>Forbidden language</td><td>Words like <code>no</code>, <code>never</code>, <code>impossible</code>, <code>always</code>, <code>fact</code> are rejected.</td></tr>
+      <tr><td>Praise density</td><td>≥3 praise words and ≥8% praise density in filler.</td></tr>
+      <tr><td>Repetition window</td><td>Same keyword twice within 6 keyword tokens is rejected.</td></tr>
+      <tr><td>Hedging</td><td>Programs with ≥50 filler words must contain a hedging phrase.</td></tr>
+      <tr><td>Bracket balance</td><td>Loop preambles and closers must match and nest.</td></tr>
+      <tr><td>Op count</td><td>Programs cannot exceed the operation limit.</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Comments</h2>
+  <p>
+    Lines beginning with <code>&gt;</code> (optionally preceded by
+    whitespace) are markdown blockquote comments. They are stripped
+    entirely before tokenization — their contents do not affect any
+    validator.
+  </p>
+
+  <h2>File format</h2>
+  <ul>
+    <li>Extension: <code>.slop</code></li>
+    <li>Encoding: UTF-8</li>
+    <li>Whitespace, punctuation, and line breaks are ignored outside string literals.</li>
+  </ul>
+
+  <div class="panel">
+    <strong>Canonical reference.</strong>
+    The complete formal specification — including pool counts,
+    thresholds, and implementation notes — lives in
+    <a href={URL_DESIGN}>DESIGN.md</a> on the repository.
+  </div>
+</DocsLayout>

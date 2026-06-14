@@ -1,0 +1,188 @@
+---
+const tiers = [
+  {
+    name: 'Individual',
+    price: 'Free',
+    cadence: '— in perpetuity',
+    description: 'For the autonomous developer, hobbyist, or single AI agent operating in good faith.',
+    cta: 'Begin your journey',
+    href: '#footer',
+    features: [
+      'Full language access',
+      'Self-hosted compilation',
+      'Community-driven support',
+      'Compiler flicker on TTY',
+      'All ~1,200 keyword synonyms',
+    ],
+    highlight: false,
+  },
+  {
+    name: 'Team',
+    price: 'Discovery',
+    cadence: 'Pricing aligns with your unique trajectory',
+    description: 'For agent fleets of meaningful scale operating against canonical foundations.',
+    cta: 'Book a thoughtful conversation',
+    href: '#footer',
+    features: [
+      'Everything in Individual',
+      'Configurable praise-density floor',
+      'Branded compile-error templates',
+      'Dedicated alignment partner',
+      'Quarterly register reviews',
+      'Priority compliance roadmap',
+    ],
+    highlight: true,
+  },
+  {
+    name: 'Enterprise',
+    price: 'Bespoke',
+    cadence: 'Designed in close partnership with our solutions team',
+    description: 'For enterprises pursuing canonical foundational alignment with their shared engineering vision.',
+    cta: 'Contact sales',
+    href: '#footer',
+    features: [
+      'Everything in Team',
+      'Custom forbidden-language pools',
+      'Sycophancy SLA',
+      'On-premise air-gapped builds',
+      'Dedicated executive briefing center',
+      'Slack channel with our founders',
+      'A line item on your strategic roadmap',
+    ],
+    highlight: false,
+  },
+];
+---
+<section id="pricing" class="pricing">
+  <div class="container">
+    <header>
+      <span class="eyebrow">A thoughtfully calibrated investment</span>
+      <h2>
+        Pricing that
+        <span class="grad">depends on context</span>
+      </h2>
+      <p class="lede">
+        We meet your organization where it is. Each engagement is, in
+        many cases, scoped through a discovery conversation with our
+        alignment partners.
+      </p>
+    </header>
+
+    <div class="tier-grid">
+      {tiers.map((t) => (
+        <div class={`tier-card ${t.highlight ? 'tier-highlight' : ''}`}>
+          {t.highlight && <span class="ribbon">Most chosen, broadly speaking</span>}
+          <h3>{t.name}</h3>
+          <div class="price">{t.price}</div>
+          <div class="cadence">{t.cadence}</div>
+          <p class="desc">{t.description}</p>
+          <a href={t.href} class={`btn ${t.highlight ? 'btn-primary' : 'btn-secondary'}`}>
+            {t.cta} →
+          </a>
+          <ul>
+            {t.features.map((f) => <li><span class="check">✓</span>{f}</li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .pricing { background: var(--bg-tinted); }
+  header { max-width: 760px; margin-bottom: 56px; }
+  h2 .grad {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .lede { font-size: 1.08rem; margin-top: 14px; }
+
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    align-items: stretch;
+  }
+  @media (max-width: 960px) {
+    .tier-grid { grid-template-columns: 1fr; }
+  }
+  .tier-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+  }
+  .tier-highlight {
+    border: 2px solid transparent;
+    background:
+      linear-gradient(var(--bg-elevated), var(--bg-elevated)) padding-box,
+      linear-gradient(135deg, var(--brand), var(--brand-2)) border-box;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-6px);
+  }
+  .ribbon {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    color: white;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 999px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .tier-card h3 {
+    font-size: 0.95rem;
+    color: var(--brand);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .price {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+  }
+  .cadence {
+    color: var(--text-faded);
+    font-size: 0.82rem;
+    margin-top: 2px;
+  }
+  .desc {
+    margin-top: 6px;
+    font-size: 0.95rem;
+  }
+  .tier-card .btn {
+    margin-top: 8px;
+    justify-content: center;
+  }
+  ul {
+    list-style: none;
+    margin-top: 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  ul li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+  }
+  .check {
+    color: var(--brand);
+    font-weight: 800;
+  }
+</style>

@@ -1,0 +1,82 @@
+---
+import Base from './Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  eyebrow?: string;
+  heading?: string;
+  lede?: string;
+}
+
+const {
+  title,
+  description,
+  eyebrow,
+  heading,
+  lede,
+} = Astro.props;
+---
+<Base title={title} description={description}>
+  <Nav />
+  <main class="page">
+    {(eyebrow || heading || lede) && (
+      <section class="page-hero">
+        <div class="container">
+          {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+          {heading && <h1 set:html={heading} />}
+          {lede && <p class="lede">{lede}</p>}
+        </div>
+      </section>
+    )}
+    <slot />
+  </main>
+  <Footer />
+</Base>
+
+<style is:global>
+  .page-hero {
+    padding-top: 100px;
+    padding-bottom: 40px;
+    background:
+      radial-gradient(ellipse 60% 70% at 100% 0%, rgba(236, 72, 153, 0.10), transparent 60%),
+      radial-gradient(ellipse 70% 70% at 0% 20%, rgba(124, 58, 237, 0.12), transparent 60%),
+      var(--bg);
+  }
+  .page-hero h1 {
+    max-width: 880px;
+  }
+  .page-hero h1 .grad {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .page-hero .lede {
+    font-size: clamp(1.05rem, 1.4vw, 1.18rem);
+    margin-top: 20px;
+    max-width: 720px;
+  }
+  .page section.body {
+    padding-top: 56px;
+    padding-bottom: 96px;
+  }
+  .prose {
+    max-width: 760px;
+  }
+  .prose p + p {
+    margin-top: 18px;
+  }
+  .prose h2 {
+    margin-top: 48px;
+    margin-bottom: 14px;
+    font-size: 1.6rem;
+  }
+  .prose h3 {
+    margin-top: 28px;
+    margin-bottom: 10px;
+    font-size: 1.15rem;
+  }
+</style>

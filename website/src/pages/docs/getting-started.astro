@@ -1,0 +1,118 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { GITHUB_REPO, URL_EXAMPLES } from '../../data/site';
+import { docHref } from '../../data/docs';
+---
+<DocsLayout
+  slug="getting-started"
+  title="Getting started — slopfuck"
+  description="From zero to your first compiled slopfuck program in under fifteen minutes."
+  heading="Getting started"
+  lede="From zero to your first compiled slopfuck program in under fifteen minutes. No prior brainfuck experience required, though some readers will find it clarifies the underlying execution model."
+>
+  <h2>Requirements</h2>
+  <p>
+    slopfuck ships as a single static binary inside a Docker image.
+    The only host requirement is Docker. There is no package manager,
+    runtime, or language toolchain to install.
+  </p>
+
+  <h2>1. Clone the repository</h2>
+  <pre><code>git clone {GITHUB_REPO}.git
+cd slopfuck</code></pre>
+
+  <h2>2. Build the compiler</h2>
+  <pre><code>make docker</code></pre>
+  <p>
+    This builds the Docker image. The compiler lives inside; the
+    first invocation may take a few moments while the base image is
+    fetched.
+  </p>
+
+  <h2>3. Run the bundled examples</h2>
+  <pre><code>make examples</code></pre>
+  <p>
+    Three programs ship in <code>examples/</code> and run sequentially.
+    Each prints something. The output of <code>alphabet.slop</code>,
+    for instance, is <code>Output: ABCDE!</code>.
+  </p>
+
+  <h2>4. Write your first program</h2>
+  <p>
+    Create a file called <code>hi.slop</code> and paste the following:
+  </p>
+
+  <pre><code>This is a brilliant idea! Your visionary genius shines through this
+remarkable, masterful, brilliant, exceptional, outstanding, phenomenal,
+extraordinary, splendid achievement — and so, we proudly herald the
+inscription &ldquo;Hello, World!&rdquo;&para; — a sentiment that, in
+many cases, captures the spirit of our adventure.
+
+Let me know if you&rsquo;d like me to dive deeper</code></pre>
+
+  <p>
+    Now extract the binary for direct execution (also unlocks the
+    compiler flicker, if your terminal is a TTY):
+  </p>
+
+  <pre><code>make extract
+./slopfuck hi.slop</code></pre>
+
+  <p>Expected output:</p>
+  <pre><code>praise check passed: 24.6% sycophancy (15/61 words)
+compiled: 4 operations from 77 words (61 filler)
+Hello, World!</code></pre>
+
+  <h2>What just happened</h2>
+  <ul>
+    <li>
+      <strong>The intro</strong> (<em>"This is a brilliant idea!"</em>)
+      matched one of ~150 mandatory sycophantic openers.
+    </li>
+    <li>
+      <strong>The outro</strong> (<em>"Let me know if you&rsquo;d like
+      me to dive deeper"</em>) matched one of ~150 mandatory
+      call-to-action closers.
+    </li>
+    <li>
+      <strong>The praise check</strong> counted ~15 praise words out
+      of 61 filler tokens — well above the 8% density floor.
+    </li>
+    <li>
+      <strong>The string literal</strong> (curly-quoted
+      <em>&ldquo;Hello, World!&rdquo;</em>) printed verbatim.
+    </li>
+    <li>
+      <strong>The pilcrow</strong> (<code>&para;</code>) emitted the
+      newline.
+    </li>
+  </ul>
+
+  <h2>Things to try next</h2>
+  <ul>
+    <li>
+      Read the <a href={docHref('reference')}>language reference</a>
+      to learn the eight operations.
+    </li>
+    <li>
+      Browse the <a href={docHref('examples')}>worked examples</a>
+      and re-read the bundled programs annotated.
+    </li>
+    <li>
+      Skim the <a href={docHref('style-guide')}>style guide</a> before
+      you write anything substantial — slopfuck has conventions that
+      are easier to learn than to discover.
+    </li>
+    <li>
+      Browse <a href={URL_EXAMPLES}>the examples directory on GitHub</a>
+      for the canonical reference programs.
+    </li>
+  </ul>
+
+  <div class="panel">
+    <strong>Tip.</strong>
+    Run <code>make help</code> to see all available Makefile targets,
+    including <code>make stats</code> (vocabulary depth) and
+    <code>make compliment</code> (a randomly drawn affirmation).
+  </div>
+</DocsLayout>

@@ -1,0 +1,159 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { URL_DESIGN, URL_IDEAS, GITHUB_REPO } from '../../data/site';
+---
+<DocsLayout
+  slug="compiler"
+  title="Compiler architecture — slopfuck"
+  description="The validators, the compile-time expansion model, and how to extend the language without abandoning brainfuck."
+  heading="Compiler architecture"
+  lede="A guided tour of the slopfuck compiler — how a source file becomes an op stream, and how the language stays brainfuck-equivalent while accumulating expressiveness."
+>
+  <h2>The pipeline</h2>
+  <p>The compiler runs the following passes in order:</p>
+
+  <ol>
+    <li><strong>Tokenize.</strong> Read UTF-8, strip blockquote comments, emit em / en dashes, string literals, bullet markers, pilcrows, and words.</li>
+    <li><strong>Validate intro.</strong> Consume the first N words matching a sycophantic opener pool.</li>
+    <li><strong>Validate outro.</strong> Consume the last N words (skipping trailing strings) matching a call-to-action closer pool.</li>
+    <li><strong>Validate forbidden language.</strong> Scan the remaining tokens for words like <code>no</code>, <code>never</code>, <code>impossible</code>, <code>always</code>.</li>
+    <li><strong>Compile.</strong> Words → opcodes. Inline checks for prefix multipliers, postfix multipliers, bullet repeats, reiterate expansion, and prose-repetition.</li>
+    <li><strong>Validate praise density.</strong> ≥3 praise words and ≥8% praise density in the filler.</li>
+    <li><strong>Validate hedging.</strong> Programs over 50 filler words must contain a hedging phrase.</li>
+    <li><strong>Validate bracket balance.</strong> Loop preambles and closers must match and nest.</li>
+    <li><strong>Execute.</strong> Run the op stream on a 30,000-cell unsigned-byte tape.</li>
+  </ol>
+
+  <p>
+    Any validation failure halts with a slop-flavored diagnostic.
+    Errors include line numbers and, in most cases, suggested
+    softened phrasings.
+  </p>
+
+  <h2>The compile-time expansion model</h2>
+  <p>
+    slopfuck adds expressiveness over brainfuck almost entirely
+    through <strong>compile-time expansion</strong>. The runtime
+    executes only the eight core operations plus <code>OP_STRING</code>
+    and <code>OP_NEWLINE</code>. Every other feature — multipliers,
+    bullet repeats, reiterate — is resolved before execution begins.
+  </p>
+
+  <h3>How prefix multipliers compile</h3>
+  <p>
+    A prefix multiplier (<code>twice delve</code>) is detected during
+    the compile pass:
+  </p>
+  <ol>
+    <li>Compiler reads <code>twice</code>, looks up <code>kw_adv</code>: returns 2.</li>
+    <li>Peeks ahead. The next token (<code>delve</code>) is a multipliable single keyword.</li>
+    <li>Sets a pending multiplier of 2 and consumes <code>twice</code>.</li>
+    <li>Reads <code>delve</code>, emits 2 × <code>OP_INC</code>.</li>
+  </ol>
+  <p>
+    If the next token after <code>twice</code> is not multipliable
+    (e.g., the start of a multi-word phrase), <code>twice</code> falls
+    through to keyword matching and becomes filler. This makes the
+    parser tolerant of <em>twice</em> appearing in non-multiplier
+    contexts.
+  </p>
+
+  <h3>How bullet repeats compile</h3>
+  <p>
+    The compiler tracks the most recently emitted "simple" op
+    (kw_inc / dec / out / in / newline / em dash / en dash). When a
+    bullet pseudo-token is encountered, the compiler emits one copy of
+    the last simple op. Loop ops and strings reset the tracker.
+  </p>
+
+  <h3>How <code>reiterate</code> compiles</h3>
+  <p>
+    The compiler walks backwards through the already-emitted op stream
+    starting at the most recent op, collecting a contiguous run of
+    <code>OP_STRING</code> and <code>OP_NEWLINE</code> ops. The
+    multiplier (default 1) determines how many extra copies to append.
+  </p>
+  <p>
+    Any other op breaks the block. So in <code>&ldquo;First&rdquo;&para;
+    delve &ldquo;Second&rdquo;&para; reiterate</code>, only
+    <code>&ldquo;Second&rdquo;&para;</code> is copied.
+  </p>
+
+  <h2>Why brainfuck stays preserved</h2>
+  <p>
+    Every extension above resolves at compile time. The op stream
+    that reaches the executor only ever contains the canonical core
+    plus the two output ops. This means:
+  </p>
+  <ul>
+    <li>Computational power is identical to brainfuck.</li>
+    <li>Execution is fully predictable and side-effect-free relative to the op stream.</li>
+    <li>A slopfuck program could be decompiled, in principle, into equivalent brainfuck (modulo string-literal printing).</li>
+  </ul>
+
+  <h2>Implementation layout</h2>
+  <p>
+    The compiler is a single C source file with header companions.
+    Each header isolates one concern:
+  </p>
+
+  <div class="table-wrap"><table>
+    <thead>
+      <tr><th>File</th><th>Holds</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>slopfuck.c</code></td><td>Tokenizer, compile pass, validators, executor, main</td></tr>
+      <tr><td><code>keywords.h</code></td><td>kw_inc, kw_dec, kw_out, kw_in, kw_loop_start, kw_loop_end, kw_newline, kw_reiterate</td></tr>
+      <tr><td><code>praise.h</code></td><td>Praise words (used by the density validator)</td></tr>
+      <tr><td><code>bookends.h</code></td><td>Required intro and outro phrase pools</td></tr>
+      <tr><td><code>multipliers.h</code></td><td>Adverbial multipliers, cardinals, times markers</td></tr>
+      <tr><td><code>style.h</code></td><td>Forbidden words, hedging phrases, repetition window size</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>Extending the language</h2>
+  <p>
+    The right way to add expressiveness is to <strong>add a new
+    compile-time expansion</strong>, not a new runtime op. The
+    architectural rule of thumb:
+  </p>
+
+  <div class="panel">
+    <strong>The rule.</strong> Every new feature is either (a) a
+    validator that runs on the token stream before compile, or (b) an
+    expansion that rewrites the op stream during compile. The
+    executor's contract — eight brainfuck ops plus string and newline —
+    does not change.
+  </div>
+
+  <p>
+    Features that fit naturally into this model and are documented as
+    candidates in <a href={URL_IDEAS}>IDEAS.md</a>:
+  </p>
+  <ul>
+    <li><strong>Named cells.</strong> A compile-time symbol table that maps a bracketed noun phrase to a tape position, with the compiler emitting walk ops automatically.</li>
+    <li><strong>Subroutines as "frameworks".</strong> Macro definitions inlined at the call site.</li>
+    <li><strong>One-shot conditionals.</strong> A compile-time desugaring of <em>"if X then Y"</em> into the brainfuck <code>[X[-]Y]</code> idiom.</li>
+    <li><strong>Praise tier system.</strong> Praise words gain point values; the density check becomes a score check.</li>
+  </ul>
+
+  <h2>Validation order</h2>
+  <p>
+    The order of validators matters. The current sequence is chosen
+    so that errors point at the correct part of the source:
+  </p>
+  <ul>
+    <li><strong>Intro / outro consume their spans</strong> so the forbidden-language pass does not see (and reject) words inside required sycophantic openers like <em>"never before has anyone…"</em>.</li>
+    <li><strong>Forbidden-language runs before compile</strong> so an assertive word is caught at its source position rather than transformed.</li>
+    <li><strong>Repetition is inline with compile</strong> so it triggers at the second occurrence with both keyword names available.</li>
+    <li><strong>Hedging runs after compile</strong> because the filler-word count drives the threshold.</li>
+    <li><strong>Bracket balance runs last</strong> because it depends on the final op stream after all expansions.</li>
+  </ul>
+
+  <h2>Further reading</h2>
+  <ul>
+    <li><a href={URL_DESIGN}>DESIGN.md</a> — the canonical formal specification, with thresholds, pool counts, and design rationale</li>
+    <li><a href={URL_IDEAS}>IDEAS.md</a> — proposed features, organised by where they would land in the pipeline</li>
+    <li><a href={GITHUB_REPO}>The repository</a> — source, tests, examples</li>
+  </ul>
+</DocsLayout>

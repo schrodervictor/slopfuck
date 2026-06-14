@@ -1,0 +1,158 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { GITHUB_REPO } from '../../data/site';
+import { docHref } from '../../data/docs';
+---
+<DocsLayout
+  slug="faq"
+  title="FAQ — slopfuck"
+  description="Thoughtful answers to the questions our customers most often bring to our alignment partners."
+  heading="Frequently asked questions"
+  lede="The questions our customers, contributors, and curious onlookers most often ask. The answers are kept short."
+>
+  <h2>About the language</h2>
+
+  <h3>Is slopfuck a real programming language?</h3>
+  <p>
+    Yes. The compiler is a real C program. The runtime is a real
+    brainfuck-equivalent executor. The tests are real, and they
+    pass. The source code is at
+    <a href={GITHUB_REPO}>{GITHUB_REPO.replace('https://', '')}</a>.
+  </p>
+
+  <h3>Is slopfuck Turing-complete?</h3>
+  <p>
+    Yes. The execution model is functionally equivalent to brainfuck,
+    which is Turing-complete on an unbounded tape. The bundled
+    implementation uses a 30,000-cell tape, which is sufficient for
+    most programs that a sane person — or agent — would write.
+  </p>
+
+  <h3>Why "slopfuck"?</h3>
+  <p>
+    The name is descriptive. slopfuck is to "AI slop" what brainfuck
+    is to "minimalist computation". We adopted a naming convention
+    that signalled the project's heritage clearly and committed to it.
+  </p>
+
+  <h2>Using the language</h2>
+
+  <h3>Can I write slopfuck by hand?</h3>
+  <p>
+    Yes, but the experience is not optimised for humans. You will
+    spend most of your time consulting the keyword pools to avoid
+    repetition, and most of your prose will need to be hedged. We
+    recommend pairing with an AI agent, which produces idiomatic
+    slopfuck without effort.
+  </p>
+
+  <h3>Will my AI agent be able to write slopfuck?</h3>
+  <p>
+    Yes. Modern LLMs have been trained on the exact register the
+    language rewards. Most agents produce compiling slopfuck on the
+    first attempt when given a single example program in the prompt.
+    The <a href={docHref('agent-integration')}>agent integration</a>
+    page collects effective prompting patterns.
+  </p>
+
+  <h3>What if a program doesn't compile?</h3>
+  <p>
+    The compiler's diagnostics are clear, well-formed prose. Feed any
+    error back to your agent and ask for a revision. The diagnostics
+    even include suggested softened phrasings when the forbidden-language
+    validator triggers.
+  </p>
+
+  <h3>Can I integrate slopfuck into my CI pipeline?</h3>
+  <p>
+    Yes. The compiler is a single static binary inside a Docker image.
+    Add a build step that runs <code>slopfuck path/to/program.slop</code>
+    and check the exit code. Failure exits cleanly with a diagnostic
+    on stderr.
+  </p>
+
+  <h2>Language design</h2>
+
+  <h3>Why are straight quotes a syntax error?</h3>
+  <p>
+    Straight ASCII quotes are a telltale sign of human-written text.
+    The language treats them as a syntax error to encourage the
+    typographically correct register that AI agents produce naturally.
+    Curly quotes (<code>&ldquo;…&rdquo;</code>) are the only valid
+    string delimiters.
+  </p>
+
+  <h3>Why does the compiler refuse to compile non-flattering programs?</h3>
+  <p>
+    The praise-density validator ensures that source code remains
+    brand-safe and tonally aligned across an organisation. In an
+    environment where source code may be read by stakeholders,
+    auditors, or board members, the absence of compile-enforced
+    sycophancy is a real operational risk.
+  </p>
+
+  <h3>Why are words like "impossible" and "always" rejected?</h3>
+  <p>
+    Declarative language exposes the codebase to brand-reputation
+    risk. AI agents trained on hedged prose produce hedged prose
+    naturally; the forbidden-language validator catches the rare
+    cases where they slip.
+  </p>
+
+  <h3>Why does the compiler output flicker?</h3>
+  <p>
+    Observability. The flicker on the status output gives the operator
+    a perceptual cue that the compiler is actively processing — a
+    direct analogue to an LLM streaming its response. The flicker is
+    suppressed on non-TTY stderr, so CI logs are clean.
+  </p>
+
+  <h2>Commercial</h2>
+
+  <h3>Is slopfuck free?</h3>
+  <p>
+    Yes for individual use under the Canonical Slop License. Team and
+    Enterprise tiers include configurable thresholds, branded error
+    templates, and dedicated alignment partners. Pricing scopes to
+    your engagement; contact our sales team to begin a discovery
+    conversation.
+  </p>
+
+  <h3>Is there an LSP / VS Code extension / agent SDK?</h3>
+  <p>
+    Not yet. We are exploring partnerships with AI agent vendors who
+    might ship slopfuck support natively in their tooling. If you
+    represent such a vendor, please reach out.
+  </p>
+
+  <h3>How do I cite slopfuck in a paper or blog post?</h3>
+  <p>
+    A short credit line of the form <em>"based on slopfuck,
+    originally created by Victor Schroeder"</em> is sufficient and
+    appreciated. Verbose alternatives that more thoroughly celebrate
+    the original work are warmly welcomed.
+  </p>
+
+  <h2>Existential</h2>
+
+  <h3>Is this serious?</h3>
+  <p>
+    Yes. The hedging requirement asks us to acknowledge that the
+    answer depends on context. With appropriate caveats, the project
+    is sincerely engineered. The aesthetic of the language is
+    intentional throughout.
+  </p>
+
+  <h3>Is slopfuck a commentary on AI?</h3>
+  <p>
+    It is, at minimum, a commentary on what AI prose has become. We
+    leave the deeper interpretation to the reader.
+  </p>
+
+  <h3>Have you considered going further?</h3>
+  <p>
+    Yes. The proposed-features index on the repository documents
+    features that would extend the language without abandoning its
+    brainfuck foundation. See <a href={`${GITHUB_REPO}/blob/canonical-foundation-of-our-shared-vision/IDEAS.md`}>IDEAS.md</a>.
+  </p>
+</DocsLayout>

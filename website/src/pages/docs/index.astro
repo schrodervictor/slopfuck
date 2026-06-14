@@ -1,0 +1,118 @@
+---
+import Page from '../../layouts/Page.astro';
+import { URL_DESIGN, URL_IDEAS, GITHUB_REPO } from '../../data/site';
+import { DOC_SECTIONS, docHref } from '../../data/docs';
+---
+<Page
+  title="Documentation — slopfuck"
+  description="Thoughtfully curated documentation for the slopfuck programming language."
+  eyebrow="Documentation"
+  heading={`A thoughtfully curated reference for <span class="grad">post-human software</span>`}
+  lede="The sections below comprise our canonical documentation roadmap. Most are available; a few remain forthcoming. The complete language specification lives, in parallel, on the source repository."
+>
+  <section class="body">
+    <div class="container">
+
+      <div class="notice">
+        <strong>A thoughtful note on availability.</strong>
+        Our documentation programme is under active curation. While
+        the dedicated guides below take their final shape, the
+        <a href={URL_DESIGN}>language design document</a>,
+        the <a href={URL_IDEAS}>proposed features index</a>, and the
+        <a href={GITHUB_REPO}>repository README</a>
+        together constitute the canonical reference. Most readers
+        will find what they need by reading the in-repo documentation
+        directly.
+      </div>
+
+      <div class="doc-grid">
+        {DOC_SECTIONS.map((s) => (
+          s.status === 'available' ? (
+            <a href={docHref(s.slug)} class="card doc-card">
+              <h3>{s.title}</h3>
+              <p>{s.summary}</p>
+              <span class="arrow">Read →</span>
+            </a>
+          ) : (
+            <div class="card doc-card doc-card-off">
+              <div class="head">
+                <h3>{s.title}</h3>
+                <span class="pill">forthcoming</span>
+              </div>
+              <p>{s.summary}</p>
+            </div>
+          )
+        ))}
+      </div>
+
+    </div>
+  </section>
+</Page>
+
+<style>
+  .notice {
+    border: 1px solid var(--border-strong);
+    background: linear-gradient(180deg, var(--brand-soft), white);
+    border-radius: var(--radius);
+    padding: 22px 26px;
+    font-size: 0.96rem;
+    color: var(--text);
+    margin-bottom: 36px;
+    line-height: 1.6;
+  }
+  .notice strong { color: var(--brand-dark); }
+
+  .doc-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 960px) { .doc-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .doc-grid { grid-template-columns: 1fr; } }
+
+  .doc-card {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    color: var(--text);
+    text-decoration: none;
+    transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  a.doc-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--brand);
+    color: var(--text);
+  }
+  .doc-card-off {
+    opacity: 0.7;
+  }
+  .doc-card .head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .doc-card h3 { font-size: 1.05rem; }
+  .doc-card p { font-size: 0.92rem; line-height: 1.55; }
+  .doc-card .arrow {
+    color: var(--brand);
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: auto;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    background: var(--bg-tinted);
+    color: var(--brand);
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+</style>

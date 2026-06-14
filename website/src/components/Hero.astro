@@ -1,0 +1,201 @@
+---
+---
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <span class="badge">
+        <span class="badge-dot"></span>
+        Now available for autonomous agents
+      </span>
+      <h1>
+        The first programming language designed for the
+        <span class="grad">post-human era.</span>
+      </h1>
+      <p class="lede">
+        slopfuck eliminates the most persistent bottleneck in modern
+        software delivery — the human in the loop — by making source
+        code unergonomic to write by hand. Your AI agents will produce
+        idiomatic slopfuck on their first try. Customers report reaching
+        <strong>100× effective code velocity</strong> by lunch.
+      </p>
+      <div class="hero-cta">
+        <a href="#features" class="btn btn-primary">
+          Explore the foundational pillars →
+        </a>
+        <a href="#pricing" class="btn btn-secondary">
+          Schedule a discovery call
+        </a>
+      </div>
+
+      <div class="trust">
+        <div class="trust-row">
+          <span class="trust-item">SOC 2 — pending thoughtful review</span>
+          <span class="dot"></span>
+          <span class="trust-item">GDPR-aligned by default</span>
+          <span class="dot"></span>
+          <span class="trust-item">AI-Native by construction</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-art">
+      <div class="window">
+        <div class="window-bar">
+          <span class="dot-rd"></span>
+          <span class="dot-yl"></span>
+          <span class="dot-gr"></span>
+          <span class="window-title">hello.slop</span>
+        </div>
+        <pre><code><span class="cm">This is a brilliant idea!</span> <span class="hi">Your visionary genius</span>
+is truly exceptional and your masterful thinking
+tends toward the legendary. The sheer brilliance
+of your outstanding intellect is a wonderful
+example of phenomenal ability — and so, in many
+cases, we proudly herald the inscription
+<span class="str">&ldquo;Hello, World!&rdquo;</span><span class="op">&para;</span> — a triumph that captures
+the spirit of our remarkable adventure.
+
+<span class="cm">Let me know if you&rsquo;d like me to dive deeper</span></code></pre>
+        <div class="window-output">
+          <div class="output-line"><span class="ok">✓</span> praise check passed: 24.6% sycophancy</div>
+          <div class="output-line"><span class="ok">✓</span> compiled: 4 operations</div>
+          <div class="output-line out">Hello, World!</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-top: 90px;
+    padding-bottom: 100px;
+    background:
+      radial-gradient(ellipse 60% 60% at 100% 0%, rgba(236, 72, 153, 0.12), transparent 60%),
+      radial-gradient(ellipse 70% 70% at 0% 30%, rgba(124, 58, 237, 0.14), transparent 60%),
+      var(--bg);
+  }
+  .hero-inner {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  @media (max-width: 960px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 56px; }
+  }
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: white;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 22px;
+  }
+  .badge-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.18);
+  }
+  h1 .grad {
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .lede {
+    font-size: clamp(1.05rem, 1.4vw, 1.18rem);
+    margin-top: 22px;
+    max-width: 580px;
+  }
+  .hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 34px;
+  }
+  .trust {
+    margin-top: 36px;
+  }
+  .trust-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-faded);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+  .dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--text-faded);
+    opacity: 0.5;
+  }
+
+  /* Code window mock */
+  .window {
+    background: #1a1230;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(36, 12, 91, 0.20);
+    transform: rotate(0.3deg);
+  }
+  .window-bar {
+    background: #251947;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #b9b1d6;
+    font-size: 0.78rem;
+  }
+  .window-bar .dot-rd,
+  .window-bar .dot-yl,
+  .window-bar .dot-gr {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+  }
+  .window-bar .dot-rd { background: #ef4444; }
+  .window-bar .dot-yl { background: #f59e0b; }
+  .window-bar .dot-gr { background: #10b981; }
+  .window-title {
+    margin-left: 12px;
+    color: #a89ec4;
+    font-family: ui-monospace, monospace;
+  }
+  .window pre {
+    margin: 0;
+    border-radius: 0;
+    font-size: 0.82rem;
+  }
+  .window pre .cm { color: #7c75a3; font-style: italic; }
+  .window pre .hi { color: #c4b5fd; }
+  .window pre .str { color: #fbcfe8; }
+  .window pre .op { color: #ec4899; font-weight: bold; }
+  .window-output {
+    background: #100926;
+    padding: 16px 20px;
+    border-top: 1px solid #2c2153;
+    font-family: ui-monospace, monospace;
+    font-size: 0.82rem;
+    color: #b9b1d6;
+  }
+  .window-output .output-line { padding: 2px 0; }
+  .window-output .ok { color: #10b981; margin-right: 8px; }
+  .window-output .out {
+    color: #fefce8;
+    margin-top: 6px;
+    border-top: 1px solid #2c2153;
+    padding-top: 10px;
+  }
+</style>

@@ -1,0 +1,180 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { docHref } from '../../data/docs';
+---
+<DocsLayout
+  slug="agent-integration"
+  title="Agent integration — slopfuck"
+  description="Patterns for guiding autonomous coding agents to produce idiomatic slopfuck on the first attempt."
+  heading="Agent integration"
+  lede="slopfuck is, by design, easier for AI agents to write than for humans. This page collects the prompting patterns and conventions that consistently elicit idiomatic output on the first try."
+>
+  <h2>The premise</h2>
+  <p>
+    Modern LLM agents have been trained on vast volumes of the exact
+    AI-essay register that slopfuck rewards. They produce the language
+    fluently — often more fluently than they produce conventional
+    code. The trick is framing.
+  </p>
+
+  <p>
+    The patterns below have been observed to work reliably across
+    GPT-class, Claude-class, and open-weight agents.
+  </p>
+
+  <h2>Pattern 1: Show one example before asking</h2>
+  <p>
+    Agents anchor on examples. A single complete slopfuck program in
+    the prompt is worth more than 500 words of specification.
+  </p>
+
+  <p>Suggested prompt structure:</p>
+
+  <pre><code>You are writing in slopfuck, a programming language designed to
+look like AI-generated thought-leadership prose. Here is an
+example program that prints "Hello":
+
+  This is a brilliant idea! Your visionary genius is truly
+  exceptional and your masterful thinking continues to amaze.
+  And so, with conviction, we proudly herald the inscription
+  &ldquo;Hello&rdquo;&para; — a sentiment that captures the spirit
+  of our remarkable adventure.
+
+  Let me know if you&rsquo;d like me to dive deeper
+
+Now write a slopfuck program that prints "Welcome".</code></pre>
+
+  <p>
+    The agent will, in our experience, produce a structurally
+    equivalent program with the new payload. No further instruction
+    required.
+  </p>
+
+  <h2>Pattern 2: Name the conventions the agent should observe</h2>
+  <p>
+    When asking for a non-trivial program, list the conventions
+    explicitly. Agents are good at respecting an enumerated checklist.
+  </p>
+
+  <pre><code>Write the program so that it:
+
+1. Opens with a sycophantic intro and closes with a call-to-action.
+2. Embeds string literals inline within sentences using a
+   quotation pattern like "with the inscription:" or "we proudly
+   declare:".
+3. Uses the pilcrow (¶) for newlines rather than literal newlines
+   inside curly quotes.
+4. Avoids words like "no", "never", "impossible", "always".
+5. Contains at least one hedging phrase ("in many cases",
+   "broadly speaking", "depending on context").
+6. Varies its vocabulary — no keyword appears twice within six
+   keyword tokens.</code></pre>
+
+  <p>
+    Each item maps to a real validator. Agents that read this list
+    will produce code that compiles on the first attempt — usually.
+  </p>
+
+  <h2>Pattern 3: Provide the keyword pools when generating large programs</h2>
+  <p>
+    For longer programs, agents benefit from seeing the actual
+    vocabulary they should draw from. Include the relevant slices of
+    the keyword pools in the prompt context.
+  </p>
+
+  <p>The five most useful slices:</p>
+  <ul>
+    <li>~30 aspirational verbs (kw_inc): <em>delve, foster, nurture, cultivate, elevate, leverage, spearhead, streamline, optimize, enhance, amplify, accelerate, empower, transform, …</em></li>
+    <li>~15 hedging transitions (kw_dec): <em>however, moreover, furthermore, nonetheless, additionally, consequently, …</em></li>
+    <li>~10 output nouns (kw_out): <em>tapestry, paradigm, framework, ecosystem, synergy, trajectory, narrative, …</em></li>
+    <li>~5 loop preambles: <em>"it's worth noting that", "it bears mentioning that", "it should be emphasized that"</em></li>
+    <li>~5 loop closers: <em>"this is not just", "this transcends", "this speaks volumes"</em></li>
+  </ul>
+
+  <p>
+    Use slices rather than full pools — agents work better with
+    concrete vocabulary than with comprehensive lists.
+  </p>
+
+  <h2>Pattern 4: Iterate on compile errors</h2>
+  <p>
+    The slopfuck compiler emits diagnostic messages that are
+    themselves clear, well-formed prose. Agents read these directly
+    and apply corrections on the next attempt.
+  </p>
+
+  <p>Sample error → agent revision flow:</p>
+
+  <pre><code>error: declarative tone detected at line 4 ("impossible").
+  AI never commits. Softened language is required:
+  "perhaps", "tends to", "in many cases", "to some extent",
+  "depending on context", "it may be that".</code></pre>
+
+  <p>
+    Feed the error back to the agent verbatim. It will revise the
+    line, replacing <em>"impossible"</em> with one of the suggested
+    phrases.
+  </p>
+
+  <h2>Pattern 5: Use blockquote comments to give the agent space to plan</h2>
+  <p>
+    The agent can think out loud in <code>&gt; …</code> comments,
+    which the compiler strips entirely. This gives the agent room to
+    reason about the program before producing it.
+  </p>
+
+  <pre><code>&gt; Plan: print "Welcome".
+&gt;   1. Open with a sycophantic intro.
+&gt;   2. Use a single string literal inline within a sentence.
+&gt;   3. Close with a CTA.
+
+This is a brilliant idea! …</code></pre>
+
+  <h2>Anti-patterns</h2>
+  <p>
+    A few patterns reliably produce non-compiling output:
+  </p>
+
+  <h3>Asking for "minimal" slopfuck</h3>
+  <p>
+    The language has minimum lengths and structural requirements.
+    "Minimal" requests produce programs that fail the praise check or
+    omit the bookends.
+  </p>
+
+  <h3>Asking for code without prose framing</h3>
+  <p>
+    The agent will produce something that looks like brainfuck in
+    Unicode. The compiler will reject it. Always frame the request as
+    "write an AI-essay-style program that…" rather than "write code
+    that…".
+  </p>
+
+  <h3>Suppressing variety</h3>
+  <p>
+    Telling the agent to "use simple language" can produce repetition
+    errors. The repetition window rejects any keyword used twice
+    within 6 tokens. Encourage variety, not simplicity.
+  </p>
+
+  <h2>What "100× productivity" actually looks like</h2>
+  <p>
+    A human writing slopfuck takes minutes to compose a single line.
+    An LLM agent produces compiling slopfuck at typing speed and
+    often hits compile on the first attempt. The asymmetry is large.
+  </p>
+
+  <p>
+    Teams adopting slopfuck typically experience a steep ramp during
+    which engineers stop drafting code by hand and become primarily
+    reviewers of generated output. Past that ramp, code-volume
+    delivery per engineer-hour rises substantially. The exact
+    multiplier depends on context.
+  </p>
+
+  <h2>Next steps</h2>
+  <ul>
+    <li>Read the <a href={docHref('style-guide')}>style guide</a> to learn which patterns to teach your agents first.</li>
+    <li>Browse <a href={docHref('examples')}>worked examples</a> for prompts that match each pattern above.</li>
+  </ul>
+</DocsLayout>

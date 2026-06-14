@@ -1,0 +1,176 @@
+/* ── Reset + base ────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+  overflow-x: hidden;
+}
+
+/* ── Design tokens ───────────────────────────────────────── */
+:root {
+  --text: #1a1230;
+  --text-muted: #5b4f7a;
+  --text-faded: #8a82a4;
+
+  --bg: #fafaff;
+  --bg-elevated: #ffffff;
+  --bg-tinted: #f5f3ff;
+
+  --brand: #7c3aed;
+  --brand-2: #ec4899;
+  --brand-soft: #ede9fe;
+  --brand-dark: #5b21b6;
+
+  --border: #e9e4f5;
+  --border-strong: #d4cef0;
+
+  --radius: 14px;
+  --radius-lg: 22px;
+
+  --shadow-sm: 0 1px 2px rgba(36, 12, 91, 0.04), 0 4px 12px rgba(36, 12, 91, 0.05);
+  --shadow-md: 0 4px 8px rgba(36, 12, 91, 0.06), 0 24px 48px rgba(36, 12, 91, 0.08);
+
+  --container: 1180px;
+  --gutter: clamp(20px, 4vw, 40px);
+}
+
+/* ── Typography ──────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+h1 { font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1.05; }
+h2 { font-size: clamp(1.8rem, 3.4vw, 2.8rem); line-height: 1.15; }
+h3 { font-size: 1.25rem; line-height: 1.3; }
+
+p { color: var(--text-muted); }
+
+a {
+  color: var(--brand-dark);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+a:hover { color: var(--brand); }
+
+code, pre {
+  font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', Menlo, Consolas, monospace;
+  font-size: 0.92em;
+}
+
+code {
+  background: var(--bg-tinted);
+  padding: 2px 6px;
+  border-radius: 6px;
+  color: var(--brand-dark);
+}
+
+pre {
+  background: #1a1230;
+  color: #e9e4f5;
+  padding: 24px;
+  border-radius: var(--radius);
+  overflow-x: auto;
+  line-height: 1.55;
+  font-size: 0.88rem;
+}
+
+pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+}
+
+/* ── Layout helpers ──────────────────────────────────────── */
+.container {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 0 var(--gutter);
+}
+
+section {
+  padding: clamp(60px, 9vw, 120px) 0;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brand);
+  margin-bottom: 18px;
+}
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--brand) 0%, var(--brand-2) 100%);
+  color: white;
+  box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35);
+}
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.45);
+  color: white;
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+}
+.btn-secondary:hover {
+  background: var(--bg-tinted);
+  color: var(--text);
+}
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--border-strong);
+}
+
+/* ── Utility ─────────────────────────────────────────────── */
+.text-muted { color: var(--text-muted); }
+.text-center { text-align: center; }

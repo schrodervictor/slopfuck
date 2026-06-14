@@ -1,0 +1,303 @@
+---
+import Base from './Base.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { DOC_SECTIONS, docHref, DOCS_BASE } from '../data/docs';
+
+interface Props {
+  slug: string;
+  title?: string;
+  description?: string;
+  eyebrow?: string;
+  heading?: string;
+  lede?: string;
+}
+
+const {
+  slug,
+  title,
+  description,
+  eyebrow = 'Documentation',
+  heading,
+  lede,
+} = Astro.props;
+
+const currentIndex = DOC_SECTIONS.findIndex((s) => s.slug === slug);
+const available = DOC_SECTIONS.filter((s) => s.status === 'available');
+const availableIdx = available.findIndex((s) => s.slug === slug);
+const prev = availableIdx > 0 ? available[availableIdx - 1] : null;
+const next = availableIdx >= 0 && availableIdx < available.length - 1
+  ? available[availableIdx + 1]
+  : null;
+---
+<Base title={title} description={description}>
+  <Nav />
+  <main class="docs">
+
+    <section class="docs-hero">
+      <div class="container">
+        <a href={DOCS_BASE} class="back">← All documentation</a>
+        <span class="eyebrow">{eyebrow}</span>
+        {heading && <h1 set:html={heading} />}
+        {lede && <p class="lede">{lede}</p>}
+      </div>
+    </section>
+
+    <div class="docs-body">
+      <div class="container docs-grid">
+
+        <aside class="docs-sidebar">
+          <nav>
+            <h4>Documentation</h4>
+            <ul>
+              {DOC_SECTIONS.map((s) => (
+                <li>
+                  {s.status === 'available' ? (
+                    <a
+                      href={docHref(s.slug)}
+                      class={s.slug === slug ? 'active' : ''}
+                    >
+                      {s.title}
+                    </a>
+                  ) : (
+                    <span class="forthcoming">
+                      {s.title}
+                      <span class="pill">soon</span>
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </nav>
+        </aside>
+
+        <article class="docs-article prose">
+          <slot />
+
+          {(prev || next) && (
+            <nav class="docs-pager">
+              {prev ? (
+                <a href={docHref(prev.slug)} class="pager-card">
+                  <span class="pager-label">Previous</span>
+                  <strong>← {prev.title}</strong>
+                </a>
+              ) : <span />}
+              {next ? (
+                <a href={docHref(next.slug)} class="pager-card pager-right">
+                  <span class="pager-label">Next</span>
+                  <strong>{next.title} →</strong>
+                </a>
+              ) : <span />}
+            </nav>
+          )}
+        </article>
+
+      </div>
+    </div>
+
+  </main>
+  <Footer />
+</Base>
+
+<style is:global>
+  .docs-hero {
+    padding-top: 90px;
+    padding-bottom: 36px;
+    background:
+      radial-gradient(ellipse 60% 70% at 100% 0%, rgba(236, 72, 153, 0.10), transparent 60%),
+      radial-gradient(ellipse 70% 70% at 0% 20%, rgba(124, 58, 237, 0.10), transparent 60%),
+      var(--bg);
+  }
+  .docs-hero .back {
+    display: inline-block;
+    margin-bottom: 18px;
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+  .docs-hero h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+  .docs-hero h1 .grad {
+    background: linear-gradient(135deg, var(--brand), var(--brand-2));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+  }
+  .docs-hero .lede {
+    font-size: 1.08rem;
+    margin-top: 14px;
+    max-width: 720px;
+  }
+
+  .docs-body {
+    padding: 36px 0 96px;
+  }
+  .docs-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  @media (max-width: 880px) {
+    .docs-grid { grid-template-columns: 1fr; gap: 24px; }
+  }
+
+  .docs-sidebar {
+    position: sticky;
+    top: 90px;
+  }
+  .docs-sidebar nav h4 {
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faded);
+    margin-bottom: 14px;
+  }
+  .docs-sidebar ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-left: 1px solid var(--border);
+    padding-left: 14px;
+  }
+  .docs-sidebar a,
+  .docs-sidebar .forthcoming {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.93rem;
+    color: var(--text-muted);
+    transition: background 0.15s ease, color 0.15s ease;
+    text-decoration: none;
+  }
+  .docs-sidebar a:hover {
+    background: var(--bg-tinted);
+    color: var(--text);
+  }
+  .docs-sidebar a.active {
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-weight: 600;
+  }
+  .docs-sidebar .forthcoming {
+    color: var(--text-faded);
+    cursor: not-allowed;
+  }
+  .docs-sidebar .pill {
+    font-size: 0.66rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    background: var(--bg-tinted);
+    color: var(--brand);
+    padding: 2px 8px;
+    border-radius: 999px;
+  }
+
+  .docs-article {
+    min-width: 0;
+    max-width: 760px;
+  }
+  .docs-article > h2 {
+    font-size: 1.6rem;
+    margin-top: 40px;
+    margin-bottom: 12px;
+  }
+  .docs-article > h2:first-child { margin-top: 0; }
+  .docs-article > h3 {
+    font-size: 1.15rem;
+    margin-top: 28px;
+    margin-bottom: 8px;
+  }
+  .docs-article > p,
+  .docs-article > ul,
+  .docs-article > ol,
+  .docs-article > pre,
+  .docs-article > .panel,
+  .docs-article > .table-wrap,
+  .docs-article > table,
+  .docs-article > blockquote {
+    margin-top: 14px;
+  }
+  .docs-article > ul,
+  .docs-article > ol {
+    padding-left: 22px;
+  }
+  .docs-article li + li { margin-top: 6px; }
+  .docs-article > p { color: var(--text-muted); }
+
+  .docs-article .panel {
+    border: 1px solid var(--border-strong);
+    background: linear-gradient(180deg, var(--brand-soft), white);
+    border-radius: var(--radius);
+    padding: 18px 22px;
+    font-size: 0.95rem;
+    color: var(--text);
+  }
+  .docs-article .panel strong { color: var(--brand-dark); }
+
+  .docs-article .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-elevated);
+  }
+  .docs-article table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92rem;
+  }
+  .docs-article th, .docs-article td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .docs-article th {
+    background: var(--bg-tinted);
+    font-weight: 700;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+  }
+  .docs-article tbody tr:last-child td { border-bottom: none; }
+  .docs-article td code { white-space: nowrap; }
+
+  .docs-pager {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 60px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+  .pager-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    color: var(--text);
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+  .pager-card:hover {
+    border-color: var(--brand);
+    transform: translateY(-1px);
+    color: var(--text);
+  }
+  .pager-card.pager-right { text-align: right; align-items: flex-end; }
+  .pager-label {
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faded);
+  }
+</style>

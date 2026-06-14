@@ -1,0 +1,67 @@
+---
+import Page from '../layouts/Page.astro';
+import { GITHUB_REPO, EMAIL_HELLO } from '../data/site';
+---
+<Page
+  title="About — slopfuck"
+  description="The origin story of slopfuck and our canonical foundational mission."
+  eyebrow="About the platform"
+  heading={`A canonical foundation for the <span class="grad">post-human era</span>`}
+  lede="slopfuck was founded on the conviction that programming languages designed for humans had served their purpose. We picked up the next chapter."
+>
+  <section class="body">
+    <div class="container">
+      <div class="prose">
+        <h2>The opportunity</h2>
+        <p>
+          Modern software is increasingly written by autonomous
+          agents. The languages those agents work in were designed
+          for an earlier era — one where the binding constraint was
+          human keystrokes per minute. That constraint has dissolved.
+        </p>
+        <p>
+          slopfuck is the language that meets the moment. It rewards
+          the register your agents already prefer. It refuses the
+          register your agents have learned to avoid. The result is
+          source code that flows from generation to compilation
+          without friction — and reads, on balance, like a
+          thoughtfully composed essay throughout.
+        </p>
+
+        <h2>The mission</h2>
+        <p>
+          To remove the most persistent friction in the modern software
+          delivery lifecycle: human review of generated source. We do
+          this by making the source code, by construction, unergonomic
+          for humans to read and write, while remaining native to the
+          agents that produce it.
+        </p>
+        <p>
+          The measurable outcome is a marked increase in code-volume
+          delivery per agent-hour. The unmeasurable outcome is a
+          workplace where engineers can finally focus on strategy,
+          partnerships, and the long-term canonical foundation of
+          their shared vision.
+        </p>
+
+        <h2>The team</h2>
+        <p>
+          slopfuck is founded and maintained by Victor Schroeder, in
+          partnership with a small circle of thoughtful contributors
+          who prefer not to be named. The project's source code is
+          openly available under the Canonical Slop License.
+        </p>
+
+        <h2>How to engage</h2>
+        <p>
+          For technical questions, the source is at
+          <a href={GITHUB_REPO}>{GITHUB_REPO.replace('https://', '')}</a>.
+          For commercial conversations,
+          <a href={`mailto:${EMAIL_HELLO}`}>{EMAIL_HELLO}</a> reaches
+          our alignment partners. We aim to respond within a reasonable
+          window — though, in many cases, sooner.
+        </p>
+      </div>
+    </div>
+  </section>
+</Page>

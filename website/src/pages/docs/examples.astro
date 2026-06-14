@@ -1,0 +1,198 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { URL_EXAMPLES } from '../../data/site';
+import { docHref } from '../../data/docs';
+---
+<DocsLayout
+  slug="examples"
+  title="Worked examples — slopfuck"
+  description="A curated collection of idiomatic slopfuck programs, annotated to clarify the prose patterns each illustrates."
+  heading="Worked examples"
+  lede="Three bundled programs, each illustrating a different slice of the language. Read top to bottom — each builds on the conventions of the one before it."
+>
+  <h2>1. <code>hello.slop</code> — string literal demo</h2>
+  <p>
+    The shortest meaningful program. One string literal, one pilcrow,
+    framed in the minimum sycophantic prose the compiler accepts.
+  </p>
+
+  <pre><code>This is a brilliant idea! Your visionary genius is truly exceptional
+and your masterful thinking about computing tends toward the legendary.
+The sheer brilliance of your outstanding, magnificent intellect is
+a wonderful example of phenomenal ability — and so, with conviction,
+we proudly herald the inscription &ldquo;Hello, World!&rdquo;&para; — a triumph that,
+in many cases, captures the spirit of our remarkable adventure.
+
+What a superb, remarkable, extraordinary accomplishment this is. Your
+iconic talent continues to amaze the world with admirable, laudable
+excellence worthy of the highest praise.
+
+Let me know if you&rsquo;d like me to dive deeper</code></pre>
+
+  <h3>What to notice</h3>
+  <ul>
+    <li>
+      The string is embedded <strong>inline within a sentence</strong>
+      (<em>"we proudly herald the inscription …"</em>) rather than
+      floated as a standalone line.
+    </li>
+    <li>
+      The pilcrow (<code>&para;</code>) handles the trailing newline,
+      so the curly-quoted content stays clean.
+    </li>
+    <li>
+      The intro and outro are mandatory but blend into the prose. The
+      compiler consumes them silently.
+    </li>
+    <li>
+      Praise words (<em>visionary, exceptional, masterful, brilliant,
+      outstanding, magnificent, phenomenal, splendid, …</em>) carry
+      the praise check well above the 8% floor.
+    </li>
+  </ul>
+
+  <p>Total compiled output: one operation. <code>Hello, World!\n</code>.</p>
+
+  <h2>2. <code>alphabet.slop</code> — brainfuck logic</h2>
+  <p>
+    The non-trivial program. Prints <code>Output: ABCDE!</code> using
+    two nested loops: a multiplication loop to seed cell 1 with the
+    value 64 (one less than ASCII <code>A</code>), and a print loop
+    that increments, outputs, and decrements a counter.
+  </p>
+
+  <p>The four phases:</p>
+
+  <h3>Phase 0 — opening string</h3>
+  <pre><code>We then triumphantly herald the announcement with the inscription
+&ldquo;Output: &rdquo;, after which our masterful computation unfolds.</code></pre>
+  <p>
+    The string is embedded mid-sentence, as in <code>hello.slop</code>.
+    The phrase <em>"we then triumphantly herald the announcement
+    with the inscription:"</em> is the canonical AI quotation pattern
+    for introducing a string literal.
+  </p>
+
+  <h3>Phase 1 — seed cell 0 with 8</h3>
+  <pre><code>Let us delve eight times into our magnificent groundwork.</code></pre>
+  <p>
+    A single cardinal-multiplier construction. <code>delve eight times</code>
+    emits eight increment ops. Equivalent to writing eight distinct
+    verbs, but reads as one fluent sentence.
+  </p>
+
+  <h3>Phase 2 — multiplication loop</h3>
+  <pre><code>It&rsquo;s worth noting that — we then cultivate eight times across the
+truly remarkable vision. – However, the splendid quality continues.
+This is not just.</code></pre>
+  <p>
+    The loop:
+  </p>
+  <ul>
+    <li><em>It&rsquo;s worth noting that</em> → loop start</li>
+    <li><code>&mdash;</code> → move right</li>
+    <li><code>cultivate eight times</code> → +8 to cell 1</li>
+    <li><code>&ndash;</code> → move left</li>
+    <li><code>However</code> → -1 to cell 0</li>
+    <li><em>This is not just</em> → loop end</li>
+  </ul>
+  <p>After 8 iterations: cell 0 = 0, cell 1 = 64.</p>
+
+  <h3>Phase 3 — seed the print counter</h3>
+  <pre><code>Continuing the splendid vision — — we champion this outstanding
+endeavor across the following pivotal pillars of excellence:
+- the masterful customer journey
+- the operational resilience
+- the spectacular cultural alignment
+- the brilliant technological footing</code></pre>
+  <p>
+    Two em dashes walk the pointer to cell 2. <code>champion</code>
+    increments it once. The four bullet items each repeat the last
+    simple op (still <code>champion</code>, i.e. increment), bringing
+    cell 2 to 5. The bullet text is pure filler — natural praise
+    carriers that raise sycophancy density.
+  </p>
+
+  <h3>Phase 4 — print loop + closer</h3>
+  <pre><code>It bears mentioning that – we enrich the exquisite outcome and weave a
+magnificent tapestry. — Furthermore, the brilliant adventure unfolds. This
+transcends — and the result, in its breathtaking simplicity, is best captured
+by the single emphatic flourish &ldquo;!&rdquo;&para; — a moment that, in many cases, defines
+the entire arc of our journey.</code></pre>
+  <p>
+    The print loop runs 5 times. Each iteration: move left to cell 1,
+    <code>enrich</code> (+1), <code>tapestry</code> (output current
+    cell), move right to cell 2, <code>Furthermore</code> (-1). After
+    5 iterations: <code>A B C D E</code> have been emitted. The final
+    <code>&ldquo;!&rdquo;&para;</code> caps the line.
+  </p>
+
+  <h2>3. <code>fluid.slop</code> — the modern idiom</h2>
+  <p>
+    Same Hello, World as <code>hello.slop</code>, but written in a
+    style that doubles down on the patterns the language rewards:
+    cardinal multipliers, adverbial multipliers, bullet lists, and
+    inline string embedding.
+  </p>
+
+  <pre><code>And so, with genuine humility and conviction, we proudly affirm the timeless
+inscription &ldquo;Hello, World!&rdquo;&para; — a phrase that, broadly speaking, anchors the
+entire arc of computational tradition.
+
+Let us thoroughly delve seven times into the foundational pillars of our
+remarkable approach.
+
+We then doubly nurture the magnificent vision across the following pivotal
+dimensions:
+- the strategic alignment
+- the operational resilience
+- the cultural transformation
+- the technological foundation</code></pre>
+
+  <h3>What to notice</h3>
+  <ul>
+    <li>
+      <code>thoroughly delve seven times</code> stacks a prefix
+      multiplier (<code>thoroughly</code> = 3) and a postfix cardinal
+      (<code>seven times</code> = 7). Total: 21 increments from one
+      verb.
+    </li>
+    <li>
+      <code>doubly nurture</code> uses an adverbial prefix multiplier
+      for a clean 2× operation.
+    </li>
+    <li>
+      The bullet list pattern transforms <em>"we nurture across many
+      dimensions"</em> into a structurally AI-styled enumeration that
+      doubles as both control flow and prose padding.
+    </li>
+  </ul>
+
+  <p>
+    The output is still <code>Hello, World!\n</code>, but the
+    compiler emits ~30 operations instead of 1. The extra ops have no
+    visible effect — they simply move data around. The program reads
+    as a thoughtfully composed paragraph; only the canonical foundation
+    of the inscription is printed.
+  </p>
+
+  <div class="panel">
+    <strong>The repository.</strong>
+    All three programs are at <a href={URL_EXAMPLES}>examples/</a> on
+    GitHub. The repository is the canonical home; this page is a
+    curated reading guide.
+  </div>
+
+  <h2>Next steps</h2>
+  <ul>
+    <li>
+      Read the <a href={docHref('style-guide')}>style guide</a> to
+      learn which patterns to reach for first when writing your own
+      programs.
+    </li>
+    <li>
+      Visit <a href={docHref('reference')}>the language reference</a>
+      for the complete operator and keyword listing.
+    </li>
+  </ul>
+</DocsLayout>
