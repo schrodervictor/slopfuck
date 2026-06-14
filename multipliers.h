@@ -43,6 +43,9 @@ static const Multiplier multipliers_adv[] = {
 
     // ── -ly adverbial multipliers ───────
     {"doubly",       2},
+    {"dually",       2},
+    {"bilaterally",  2},
+    {"pairwise",     2},
     {"triply",       3},
     {"quadruply",    4},
     {"quintuply",    5},
@@ -151,6 +154,11 @@ static const Multiplier cardinals[] = {
     {"hundred",    100},
 
     // ── Vague AI quantifiers ────────────
+    {"couple",       2},
+    {"pair",         2},
+    {"duo",          2},
+    {"brace",        2},
+    {"tandem",       2},
     {"several",      3},
     {"numerous",     5},
     {"multiple",     4},
