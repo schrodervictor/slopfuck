@@ -371,6 +371,47 @@ static void oplist_free(OpList *ol) {
         free(ol->strings[i]);
 }
 
+// ── Debug trace ─────────────────────────────────────────────
+// Optional collector used by --stripped to record one display
+// row per kept token (skipping filler). Each row carries the
+// emitted op character and the canonical source token.
+typedef struct {
+    int *ops;          // OP_* code (or -1 for prefix multipliers)
+    char **labels;     // canonical source token / phrase
+    int *mults;        // emitted multiplier (1 by default)
+    int count;
+    int capacity;
+} DebugTrace;
+
+static void trace_init(DebugTrace *t) {
+    t->capacity = 256;
+    t->count = 0;
+    t->ops = malloc(t->capacity * sizeof(int));
+    t->labels = malloc(t->capacity * sizeof(char *));
+    t->mults = malloc(t->capacity * sizeof(int));
+}
+
+static void trace_free(DebugTrace *t) {
+    for (int i = 0; i < t->count; i++) free(t->labels[i]);
+    free(t->ops);
+    free(t->labels);
+    free(t->mults);
+}
+
+static void trace_push(DebugTrace *t, int op, const char *label, int mult) {
+    if (!t) return;
+    if (t->count >= t->capacity) {
+        t->capacity *= 2;
+        t->ops = realloc(t->ops, t->capacity * sizeof(int));
+        t->labels = realloc(t->labels, t->capacity * sizeof(char *));
+        t->mults = realloc(t->mults, t->capacity * sizeof(int));
+    }
+    t->ops[t->count] = op;
+    t->labels[t->count] = strdup(label);
+    t->mults[t->count] = mult;
+    t->count++;
+}
+
 // ── Repetition window ───────────────────────────────────────
 // Tracks the last N matched keyword strings (lowercased). When the
 // same keyword reappears within the window, the compiler rejects
@@ -487,7 +528,8 @@ static int peek_postfix_multiplier(WordList *wl, int i, int end,
 //     do not duplicate loop ops or string literals.
 static int compile(WordList *wl, OpList *ol, int *filler_word_count,
                    int *filler_words_capacity, char ***filler_words_out,
-                   int skip_start, int skip_end, const char *src) {
+                   int skip_start, int skip_end, const char *src,
+                   DebugTrace *trace) {
     oplist_init(ol);
     *filler_word_count = 0;
     *filler_words_capacity = 4096;
@@ -512,6 +554,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
         if (w[0] == '\x04') {
             if (last_simple_op >= 0) {
                 if (emit_op_n(ol, last_simple_op, 1) < 0) return -1;
+                trace_push(trace, last_simple_op, "\xe2\x80\xa2", 1);
             }
             pending_multiplier = 1;
             i++;
@@ -523,6 +566,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
             ol->ops[ol->count] = OP_STRING;
             ol->strings[ol->count] = strdup(w + 1);
             ol->count++;
+            trace_push(trace, OP_STRING, w + 1, 1);
             pending_multiplier = 1;
             // strings don't update last_simple_op
             i++;
@@ -535,6 +579,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
             int mult = pending_multiplier *
                        peek_postfix_multiplier(wl, i, end, &post_consumed);
             if (emit_op_n(ol, OP_NEWLINE, mult) < 0) return -1;
+            trace_push(trace, OP_NEWLINE, "\xc2\xb6", mult);
             last_simple_op = OP_NEWLINE;
             pending_multiplier = 1;
             i += 1 + post_consumed;
@@ -547,6 +592,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
             int mult = pending_multiplier *
                        peek_postfix_multiplier(wl, i, end, &post_consumed);
             if (emit_op_n(ol, OP_RIGHT, mult) < 0) return -1;
+            trace_push(trace, OP_RIGHT, "\xe2\x80\x94", mult);
             last_simple_op = OP_RIGHT;
             pending_multiplier = 1;
             i += 1 + post_consumed;
@@ -558,6 +604,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
             int mult = pending_multiplier *
                        peek_postfix_multiplier(wl, i, end, &post_consumed);
             if (emit_op_n(ol, OP_LEFT, mult) < 0) return -1;
+            trace_push(trace, OP_LEFT, "\xe2\x80\x93", mult);
             last_simple_op = OP_LEFT;
             pending_multiplier = 1;
             i += 1 + post_consumed;
@@ -572,6 +619,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
             if (rep_check_and_push(&rep, matched_phrase,
                                    matched_phrase, line) < 0) return -1;
             ol->ops[ol->count++] = OP_LOOP_START;
+            trace_push(trace, OP_LOOP_START, matched_phrase, 1);
             pending_multiplier = 1;
             last_simple_op = -1;
             i += consumed;
@@ -584,6 +632,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
             if (rep_check_and_push(&rep, matched_phrase,
                                    matched_phrase, line) < 0) return -1;
             ol->ops[ol->count++] = OP_LOOP_END;
+            trace_push(trace, OP_LOOP_END, matched_phrase, 1);
             pending_multiplier = 1;
             last_simple_op = -1;
             i += consumed;
@@ -614,6 +663,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
                              match_single_word(nxt, kw_reiterate));
             if (is_simple) {
                 pending_multiplier = adv;
+                trace_push(trace, -1, w, adv);
                 i++;
                 continue;
             }
@@ -636,6 +686,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
             int mult = pending_multiplier *
                        peek_postfix_multiplier(wl, i, end, &post_consumed);
             if (emit_op_n(ol, kw_op, mult) < 0) return -1;
+            trace_push(trace, kw_op, w, mult);
             last_simple_op = kw_op;
             pending_multiplier = 1;
             i += 1 + post_consumed;
@@ -683,6 +734,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
                 }
             }
             last_simple_op = -1;
+            trace_push(trace, -2, w, mult);
             pending_multiplier = 1;
             i += 1 + post_consumed;
             continue;
@@ -1041,13 +1093,109 @@ static int execute(OpList *ol) {
     return 0;
 }
 
+// ── Debug printers ──────────────────────────────────────────
+static char op_char(int op) {
+    switch (op) {
+    case OP_RIGHT:      return '>';
+    case OP_LEFT:       return '<';
+    case OP_INC:        return '+';
+    case OP_DEC:        return '-';
+    case OP_OUT:        return '.';
+    case OP_IN:         return ',';
+    case OP_LOOP_START: return '[';
+    case OP_LOOP_END:   return ']';
+    case OP_STRING:     return '"';
+    case OP_NEWLINE:    return 'N';
+    default:            return '?';
+    }
+}
+
+// Stripped view: the program with filler removed, one row per
+// kept token. Each row shows the emitted op (or a multiplier
+// marker) and the canonical source token / phrase.
+static void print_stripped(DebugTrace *t) {
+    fprintf(stdout,
+        "\xe2\x94\x80\xe2\x94\x80\xe2\x94\x80 stripped program "
+        "(%d kept tokens) \xe2\x94\x80\xe2\x94\x80\xe2\x94\x80\n", t->count);
+    for (int i = 0; i < t->count; i++) {
+        int op = t->ops[i];
+        const char *label = t->labels[i];
+        int mult = t->mults[i];
+        if (op == -1) {
+            // Prefix multiplier — sets pending multiplier for next op.
+            fprintf(stdout, "  \xc3\x97%-3d %s\n", mult, label);
+        } else if (op == -2) {
+            // Reiterate — repeats prior string/newline block.
+            if (mult > 1)
+                fprintf(stdout, "  \xe2\x86\xbb\xc3\x97%-2d %s\n", mult, label);
+            else
+                fprintf(stdout, "  \xe2\x86\xbb    %s\n", label);
+        } else if (op == OP_STRING) {
+            fprintf(stdout, "  \"    \"%s\"\n", label);
+        } else if (mult > 1) {
+            fprintf(stdout, "  %c\xc3\x97%-3d %s\n", op_char(op), mult, label);
+        } else {
+            fprintf(stdout, "  %c    %s\n", op_char(op), label);
+        }
+    }
+}
+
+// Opcodes view: the compiled program as a stream of BF-equivalent
+// characters. Strings are emitted as ."<content>" runs, the
+// pilcrow newline as ¶. Wraps at 72 columns for readability.
+static void print_opcodes(OpList *ol) {
+    fprintf(stdout,
+        "\xe2\x94\x80\xe2\x94\x80\xe2\x94\x80 opcodes "
+        "(%d ops) \xe2\x94\x80\xe2\x94\x80\xe2\x94\x80\n", ol->count);
+    int col = 0;
+    for (int i = 0; i < ol->count; i++) {
+        int op = ol->ops[i];
+        if (op == OP_STRING) {
+            const char *s = ol->strings[i] ? ol->strings[i] : "";
+            if (col != 0) { fputc('\n', stdout); col = 0; }
+            fprintf(stdout, "  .\"%s\"\n", s);
+            continue;
+        }
+        if (op == OP_NEWLINE) {
+            if (col != 0) { fputc('\n', stdout); col = 0; }
+            fprintf(stdout, "  \xc2\xb6\n");
+            continue;
+        }
+        if (col == 0) fputs("  ", stdout);
+        fputc(op_char(op), stdout);
+        col++;
+        if (col >= 64) { fputc('\n', stdout); col = 0; }
+    }
+    if (col != 0) fputc('\n', stdout);
+}
+
 // ── Main ────────────────────────────────────────────────────
 int main(int argc, char **argv) {
-    if (argc < 2) {
+    int show_stripped = 0;
+    int show_opcodes = 0;
+    const char *filename = NULL;
+    for (int a = 1; a < argc; a++) {
+        const char *arg = argv[a];
+        if (strcmp(arg, "--stripped") == 0 || strcmp(arg, "-s") == 0) {
+            show_stripped = 1;
+        } else if (strcmp(arg, "--opcodes") == 0 || strcmp(arg, "-o") == 0) {
+            show_opcodes = 1;
+        } else if (arg[0] == '-' && arg[1] != '\0') {
+            fprintf(stderr, "error: unknown flag '%s'\n", arg);
+            return 1;
+        } else if (!filename) {
+            filename = arg;
+        } else {
+            fprintf(stderr, "error: extra argument '%s'\n", arg);
+            return 1;
+        }
+    }
+
+    if (!filename) {
         fprintf(stderr,
             "slopfuck \xe2\x80\x94 the AI slop programming language\n"
             "\n"
-            "Usage: slopfuck <file.slop>\n"
+            "Usage: slopfuck [--stripped|-s] [--opcodes|-o] <file.slop>\n"
             "\n"
             "Write programs using AI-cliche keywords surrounded\n"
             "by sycophantic filler prose. Programs that do not\n"
@@ -1055,13 +1203,17 @@ int main(int argc, char **argv) {
             "\n"
             "String literals use curly quotes: \xe2\x80\x9cHello, World!"
             "\xe2\x80\x9d\n"
-            "Straight quotes (\") are a syntax error.\n");
+            "Straight quotes (\") are a syntax error.\n"
+            "\n"
+            "Debug flags (skip execution):\n"
+            "  --stripped, -s   print the program with filler removed\n"
+            "  --opcodes,  -o   print the compiled brainfuck opcodes\n");
         return 1;
     }
 
-    FILE *f = fopen(argv[1], "r");
+    FILE *f = fopen(filename, "r");
     if (!f) {
-        fprintf(stderr, "error: cannot open '%s'\n", argv[1]);
+        fprintf(stderr, "error: cannot open '%s'\n", filename);
         return 1;
     }
     fseek(f, 0, SEEK_END);
@@ -1096,8 +1248,11 @@ int main(int argc, char **argv) {
     char **filler_words = NULL;
     int filler_count = 0;
     int filler_cap = 0;
+    DebugTrace trace;
+    DebugTrace *trace_arg = NULL;
+    if (show_stripped) { trace_init(&trace); trace_arg = &trace; }
     if (compile(&wl, &ol, &filler_count, &filler_cap, &filler_words,
-                intro_consumed, outro_consumed, src) != 0)
+                intro_consumed, outro_consumed, src, trace_arg) != 0)
         return 1;
 
     // Validate praise
@@ -1119,8 +1274,15 @@ int main(int argc, char **argv) {
             ol.count, wl.count, filler_count);
     flicker_stderr(compiled_msg);
 
-    int result = execute(&ol);
+    int result = 0;
+    if (show_stripped || show_opcodes) {
+        if (show_stripped) print_stripped(&trace);
+        if (show_opcodes) print_opcodes(&ol);
+    } else {
+        result = execute(&ol);
+    }
 
+    if (show_stripped) trace_free(&trace);
     for (int i = 0; i < filler_count; i++)
         free(filler_words[i]);
     free(filler_words);
