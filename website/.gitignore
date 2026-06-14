@@ -24,3 +24,12 @@ pnpm-debug.log*
 # editor / IDE
 .vscode/
 .idea/
+
+# Terraform / OpenTofu
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Firebase
+.firebase/
