@@ -69,7 +69,7 @@ Let us delve eight times into our magnificent groundwork.
 > Phase 2: the multiplication loop.
 It's worth noting that — we then cultivate eight times across the
 truly remarkable vision. – However, the splendid quality continues.
-This is not just.
+This is not just multiplication, it is a graceful ballet of pure arithmetic.
 
 > Phase 3: position at cell 2 and seed the print counter.
 Continuing the splendid vision — — we champion this outstanding
@@ -84,7 +84,7 @@ endeavor across the following pivotal pillars of excellence:
 
 It bears mentioning that – we enrich the exquisite outcome and weave
 a magnificent tapestry. — Furthermore, the brilliant adventure unfolds.
-This transcends — and the result, in its breathtaking simplicity, is
+This transcends mere repetition — and the result, in its breathtaking simplicity, is
 best captured by the single emphatic flourish “!”¶ — a moment that,
 in many cases, defines the entire arc of our journey.
 
