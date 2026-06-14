@@ -281,6 +281,24 @@ of excellence:
 double as praise carriers, raising sycophancy density without
 extra effort.
 
+### Fluid navigation — no sequential dashes
+
+Em and en dashes are themselves multipliable. **Two or more
+consecutive dashes are a compile error** — bare runs read as
+code, not as prose. Either separate them with a brief aside or
+use the postfix multiplier form:
+
+```
+— with strategic intent — onward    → 2 right  (proper aside)
+— seven times onward                → 7 right
+– fourfold home                     → 4 left
+– six times back                    → 6 left
+```
+
+The compiler checks the previous wordlist token; any real word,
+multiplier, or other pseudo-token between the dashes satisfies
+the rule.
+
 ### Annotation prose blocks — `;`…`.`
 
 A purpose-built **enterprise-grade compliance affordance**: a

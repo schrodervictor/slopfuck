@@ -171,7 +171,35 @@ spearhead, and streamline our magnificent foundation.</code></pre>
     against the reference.
   </p>
 
-  <h2>9. Use annotation blocks for dense praise prose</h2>
+  <h2>9. Never write sequential dashes</h2>
+  <p>
+    Two or more consecutive em or en dashes are a
+    <strong>compile error</strong>. Bare runs read as code, not
+    as prose. Either separate the dashes with a brief aside or
+    compress the run with a postfix multiplier.
+  </p>
+
+  <h3>Rejected</h3>
+  <pre><code>We step &mdash; &mdash; onward to the witness slot.</code></pre>
+  <pre><code>We step &mdash; and step &mdash; and step &mdash; and step &mdash; and step &mdash; and step &mdash; and step &mdash; onward to the witness slot.</code></pre>
+  <p>
+    The first is rejected directly. The second is technically
+    valid (single dashes separated by real words) but reads as
+    a thesaurus dump and should be rewritten.
+  </p>
+
+  <h3>Prefer</h3>
+  <pre><code>We step &mdash; with strategic intent &mdash; onward to the witness slot.</code></pre>
+  <pre><code>We step &mdash; seven times onward to the witness slot.</code></pre>
+
+  <p>
+    The first carries a proper parenthetical aside between the
+    dashes. The second uses the postfix multiplier form for the
+    full seven-cell move. Both produce well-formed prose; the
+    compiler enforces the absence of bare runs.
+  </p>
+
+  <h2>10. Use annotation blocks for dense praise prose</h2>
   <p>
     A semicolon opens an annotation block; the next period (or
     another semicolon) closes it. Inside the block, every token
@@ -219,7 +247,7 @@ bring to this session is exceptional.</code></pre>
     <code>;</code>&hellip;<code>;</code> pair instead.
   </p>
 
-  <h2>10. Comment freely with blockquotes</h2>
+  <h2>11. Comment freely with blockquotes</h2>
   <p>
     Lines beginning with <code>&gt;</code> are stripped before
     tokenization. Use them to document phases of a program, explain

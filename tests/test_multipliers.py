@@ -225,5 +225,40 @@ class BulletMultiplierTests(SlopfuckTest):
         self.assertEqual(out, "\x05")
 
 
+# ── Dash multipliers (navigation idiom) ─────────────────────────────
+
+
+class DashMultiplierTests(SlopfuckTest):
+    """Em/en dashes accept the same postfix-multiplier forms as keywords."""
+
+    def test_em_dash_postfix_adverb(self):
+        # "— sevenfold" = 7 right. delve at cell 7, tapestry to print.
+        body = "— sevenfold delve tapestry"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "\x01")  # cell 7 was 0, +1 = 1
+
+    def test_em_dash_postfix_cardinal_with_times(self):
+        # "— seven times onward" = 7 right.
+        body = "— seven times onward delve tapestry"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "\x01")
+
+    def test_en_dash_postfix_cardinal_with_times(self):
+        # Move right 5, then left 5 with "– five times" — end at cell 0.
+        # cell 0 was set to 8 by delve eight times.
+        body = "delve eight times — fivefold – five times tapestry"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "\x08")
+
+    def test_em_dash_with_no_multiplier_is_one_right(self):
+        body = "— delve tapestry"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "\x01")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

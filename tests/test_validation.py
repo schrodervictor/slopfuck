@@ -360,5 +360,47 @@ class HedgingTests(SlopfuckTest):
         self.assertEqual(code, 0, err)
 
 
+# ── Sequential dashes ───────────────────────────────────────────────
+
+
+class SequentialDashTests(SlopfuckTest):
+    """Two or more consecutive dashes are a compile error."""
+
+    def test_two_em_dashes_rejected(self):
+        body = "— — delve tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("sequential dashes", err)
+
+    def test_two_en_dashes_rejected(self):
+        body = "delve — – – tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("sequential dashes", err)
+
+    def test_mixed_dashes_rejected(self):
+        # em followed immediately by en is still a run.
+        body = "— – delve tapestry"
+        _, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 1)
+        self.assertIn("sequential dashes", err)
+
+    def test_dash_with_word_between_passes(self):
+        # Aside between the dashes satisfies the rule.
+        body = "— and — delve tapestry"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "\x01")  # cell 2 was 0, +1 = 1
+
+    def test_dash_with_multiplier_consumes_run(self):
+        # "— sevenfold —" → first dash consumes "sevenfold" as postfix,
+        # so the previous token of the second dash is "sevenfold", not
+        # a dash. Run is broken. (And it emits 8 right ops total.)
+        body = "— sevenfold — delve tapestry"
+        out, err, code = self.run_slop(make_program(body))
+        self.assertEqual(code, 0, err)
+        self.assertEqual(out, "\x01")  # cell 8 was 0, +1 = 1
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)

@@ -299,6 +299,24 @@ Cardinals only work in **postfix** position. `seven delve` would be
 unnatural English; AI doesn't say "two delve", it says "delve two
 times" or "delve twice".
 
+**Navigation idiom — no sequential dashes.** Em/en dashes are
+themselves multipliable. **Two or more consecutive dashes are
+a compile error**: bare runs read as code, not as prose. Either
+insert a brief aside between the dashes or use the postfix
+multiplier form:
+
+```
+— with strategic intent — onward     → 2 right  (proper aside)
+— seven times onward                 → 7 right
+– fourfold home                      → 4 left
+– six times back                     → 6 left
+```
+
+The compile-time check looks at the previous wordlist token: if
+it is also a dash pseudo-token, the program is rejected. Any
+real word, multiplier, or other pseudo-token between the dashes
+satisfies the check.
+
 The full multiplier word list is in `multipliers.h` — 80+ adverbial
 multipliers (twice, thrice, doubly, triply through octuply, the
 full -fold series from twofold to hundredfold, vague AI quantifiers

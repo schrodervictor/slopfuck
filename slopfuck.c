@@ -665,6 +665,20 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
 
         // Em dash → RIGHT (multipliable)
         if (strcmp(w, "\x01") == 0) {
+            if (i > skip_start &&
+                (wl->words[i - 1][0] == '\x01' ||
+                 wl->words[i - 1][0] == '\x02')) {
+                int line = line_at(src, wl->positions[i]);
+                fprintf(stderr,
+                    "error: sequential dashes detected at line %d\n"
+                    "  Two or more consecutive em/en dashes read as code,\n"
+                    "  not as prose. Either insert a brief aside between\n"
+                    "  them (\xe2\x80\x9c\xe2\x80\x94 with strategic"
+                    " intent \xe2\x80\x94\xe2\x80\x9d) or use the postfix\n"
+                    "  multiplier form (\xe2\x80\x9c\xe2\x80\x94 seven"
+                    " times onward\xe2\x80\x9d).\n", line);
+                return -1;
+            }
             int post_consumed = 0;
             int mult = pending_multiplier *
                        peek_postfix_multiplier(wl, i, end, &post_consumed);
@@ -677,6 +691,20 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
         }
         // En dash → LEFT (multipliable)
         if (strcmp(w, "\x02") == 0) {
+            if (i > skip_start &&
+                (wl->words[i - 1][0] == '\x01' ||
+                 wl->words[i - 1][0] == '\x02')) {
+                int line = line_at(src, wl->positions[i]);
+                fprintf(stderr,
+                    "error: sequential dashes detected at line %d\n"
+                    "  Two or more consecutive em/en dashes read as code,\n"
+                    "  not as prose. Either insert a brief aside between\n"
+                    "  them (\xe2\x80\x9c\xe2\x80\x93 with quiet resolve"
+                    " \xe2\x80\x93\xe2\x80\x9d) or use the postfix\n"
+                    "  multiplier form (\xe2\x80\x9c\xe2\x80\x93 seven"
+                    " times home\xe2\x80\x9d).\n", line);
+                return -1;
+            }
             int post_consumed = 0;
             int mult = pending_multiplier *
                        peek_postfix_multiplier(wl, i, end, &post_consumed);

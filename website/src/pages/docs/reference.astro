@@ -137,6 +137,32 @@ import { docHref } from '../../data/docs';
     <code>instances</code>, <code>moments</code>.
   </p>
 
+  <h3>Navigation idiom &mdash; no sequential dashes</h3>
+  <p>
+    Em and en dashes are themselves multipliable. <strong>Two or
+    more consecutive dashes are a compile error</strong> &mdash;
+    bare runs read as code, not as prose. Either separate the
+    dashes with a brief aside or use the postfix multiplier form.
+  </p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Pattern</th><th>Effect</th></tr></thead>
+    <tbody>
+      <tr><td><code>&mdash; with strategic intent &mdash; onward</code></td><td>2 right (proper aside)</td></tr>
+      <tr><td><code>&mdash; seven times onward</code></td><td>7 right</td></tr>
+      <tr><td><code>&mdash; fourfold onward</code></td><td>4 right</td></tr>
+      <tr><td><code>&ndash; six times home</code></td><td>6 left</td></tr>
+      <tr><td><code>&ndash; thrice back</code></td><td>3 left</td></tr>
+    </tbody>
+  </table></div>
+  <p>
+    The compile-time check looks at the previous wordlist token:
+    if it is also a dash pseudo-token, the program is rejected.
+    Any real word, multiplier, or other pseudo-token between the
+    dashes satisfies the rule. See the
+    <a href={docHref('style-guide')}>style guide</a> for
+    conventional patterns.
+  </p>
+
   <h3>Annotation prose blocks &mdash; <code>;</code>&hellip;<code>.</code></h3>
   <p>
     An enterprise-grade compliance affordance: a syntactically
