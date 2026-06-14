@@ -82,11 +82,20 @@ class SlopfuckTest(unittest.TestCase):
         # Always re-extract — the docker image may have been rebuilt.
         extract_binary()
 
-    def run_slop(self, source: str, stdin: str = "", timeout: int = 10):
+    def run_slop(
+        self,
+        source: str,
+        stdin: str = "",
+        timeout: int = 10,
+        extra_args=(),
+    ):
         """Compile + execute a slopfuck source string.
 
         Returns (stdout, stderr, code) as (str, str, int). Bytes that
         aren't valid UTF-8 are replaced rather than raising.
+
+        Pass `extra_args` to test CLI flags like ("--stripped",) or
+        ("--opcodes",) — they precede the filename argument.
         """
         with tempfile.NamedTemporaryFile(
             suffix=".slop", mode="w", encoding="utf-8", delete=False
@@ -95,7 +104,7 @@ class SlopfuckTest(unittest.TestCase):
             path = f.name
         try:
             result = subprocess.run(
-                [BINARY, path],
+                [BINARY, *extra_args, path],
                 input=stdin.encode("utf-8") if stdin else None,
                 capture_output=True,
                 timeout=timeout,
