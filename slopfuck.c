@@ -141,7 +141,11 @@ static int is_curly_apostrophe(const char *p) {
 }
 
 // ── Tokenize source ─────────────────────────────────────────
-// Pseudo-tokens: "\x01" = em dash, "\x02" = en dash
+// Pseudo-tokens:
+//   "\x01" = em dash, "\x02" = en dash, "\x04" = bullet,
+//   "\x05" = pilcrow, "\x06" = annotation-block toggle (`;`),
+//   "\x07" = sentence boundary (`.`) — closes an open annotation
+//             block; ignored otherwise.
 // String literals: "\x03" prefix followed by the string content
 //
 // Comments: markdown blockquote lines (optionally indented, starting
@@ -239,6 +243,18 @@ static int tokenize_source(const char *src, int len, WordList *wl) {
                 "  quotation marks.\n",
                 line_at(src, i));
             return -1;
+        }
+
+        // Annotation-block toggle and sentence boundary.
+        if (src[i] == ';') {
+            wordlist_push(wl, "\x06", i);
+            i++;
+            continue;
+        }
+        if (src[i] == '.') {
+            wordlist_push(wl, "\x07", i);
+            i++;
+            continue;
         }
 
         if (is_word_char(src[i]) ||
@@ -539,6 +555,7 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
     int i = skip_start;
     int pending_multiplier = 1;
     int last_simple_op = -1;  // tracks last bullet-duplicable op
+    int in_free_prose = 0;    // inside a ;... annotation block
     RepetitionWindow rep;
     rep_init(&rep);
 
@@ -549,6 +566,66 @@ static int compile(WordList *wl, OpList *ol, int *filler_word_count,
         }
 
         const char *w = wl->words[i];
+
+        // Annotation-block toggle (;) — flips free-prose mode.
+        // Inside free-prose mode, every token except string literals
+        // is treated as filler: em/en dashes, pilcrows, bullets,
+        // multipliers, and keyword-pool matches all become passive.
+        // This gives writers an escape hatch for praise and hedging
+        // padding without risking accidental ops.
+        if (w[0] == '\x06') {
+            in_free_prose = !in_free_prose;
+            pending_multiplier = 1;
+            last_simple_op = -1;
+            trace_push(trace, -3, in_free_prose ? ";" : ";", 1);
+            i++;
+            continue;
+        }
+        // Sentence boundary (.) — closes an open annotation block.
+        // Outside an annotation block, the token is silently consumed.
+        if (w[0] == '\x07') {
+            if (in_free_prose) {
+                in_free_prose = 0;
+                pending_multiplier = 1;
+                last_simple_op = -1;
+                trace_push(trace, -3, ".", 1);
+            }
+            i++;
+            continue;
+        }
+
+        if (in_free_prose) {
+            // String literals still emit — printed output is the one
+            // syntactic effect the annotation block does not suppress.
+            if (w[0] == '\x03') {
+                ol->ops[ol->count] = OP_STRING;
+                ol->strings[ol->count] = strdup(w + 1);
+                ol->count++;
+                trace_push(trace, OP_STRING, w + 1, 1);
+                pending_multiplier = 1;
+                i++;
+                continue;
+            }
+            // Other pseudo-tokens (em/en, pilcrow, bullet) — silently
+            // consumed. No op, no multiplier consumption.
+            if ((unsigned char)w[0] < 0x20) {
+                pending_multiplier = 1;
+                i++;
+                continue;
+            }
+            // Real word inside annotation block — pure filler. No
+            // keyword matching, no repetition-window push.
+            if (*filler_word_count >= *filler_words_capacity) {
+                *filler_words_capacity *= 2;
+                *filler_words_out = realloc(*filler_words_out,
+                                            *filler_words_capacity * sizeof(char *));
+            }
+            (*filler_words_out)[*filler_word_count] = strdup(w);
+            (*filler_word_count)++;
+            pending_multiplier = 1;
+            i++;
+            continue;
+        }
 
         // Bullet marker — duplicate the most recent simple op.
         if (w[0] == '\x04') {
@@ -1124,6 +1201,10 @@ static void print_stripped(DebugTrace *t) {
         if (op == -1) {
             // Prefix multiplier — sets pending multiplier for next op.
             fprintf(stdout, "  \xc3\x97%-3d %s\n", mult, label);
+        } else if (op == -3) {
+            // Annotation block boundary (`;` toggle or `.` close).
+            fprintf(stdout, "  %s    (annotation %s)\n",
+                    label, label[0] == ';' ? "toggle" : "close");
         } else if (op == -2) {
             // Reiterate — repeats prior string/newline block.
             if (mult > 1)

@@ -29,9 +29,9 @@ Two principles guide every design decision:
 
 slopfuck programs are functionally equivalent to brainfuck. A program
 operates on a tape of 30,000 unsigned byte cells with a single data
-pointer. The 8 brainfuck operations are preserved, plus two additions
-(string literals and a newline output op) that do not change
-computational power:
+pointer. The 8 brainfuck operations are preserved, alongside additional
+runtime ops (string literals and a newline output op) that do not
+change computational power:
 
 | brainfuck | slopfuck token class | example |
 |---|---|---|
@@ -472,6 +472,77 @@ Compare:
 This is a writing convention, not a compiler rule — but every shipped
 example follows it, and `IDEAS.md` may eventually promote it to a
 soft warning.
+
+### Annotation prose blocks (`;` … `.`)
+
+The annotation block is a syntactically inert prose region for
+**enterprise-grade compliance padding**: dense praise, hedging,
+brand-voice flourish, and any other register-correctness text
+that would otherwise risk emitting phantom ops every time the
+writer reaches for a richer adjective.
+
+**Mechanics.**
+
+- `;` toggles annotation mode (open if closed, close if open).
+- `.` closes annotation mode if it is currently open; outside an
+  open block, `.` is silently consumed.
+- Both markers are tokenized as pseudo-tokens (`\x06` and `\x07`)
+  before the compile pass.
+
+**Behaviour inside a block.**
+
+| Token | Effect in annotation mode |
+|---|---|
+| `kw_inc`, `kw_dec`, `kw_out`, `kw_in`, `kw_newline`, `kw_reiterate` | Inert filler — no op emitted |
+| Loop start / end phrases | Inert filler |
+| Em dash `—`, en dash `–` | Inert filler (no `>` / `<`) |
+| Pilcrow `¶` | Inert filler (no `OP_NEWLINE`) |
+| Bullet `•` | Inert filler (no duplicated op) |
+| Multipliers | Reset; not interpreted |
+| Curly-quoted string literals | **Still emit `OP_STRING`** — printed output is the one effect annotation does not suppress |
+
+**Validator interaction.**
+
+| Validator | Treatment inside annotation |
+|---|---|
+| Praise density | Annotation words count — that is the whole point |
+| Hedging requirement | Annotation can satisfy it |
+| Forbidden definitive language | Still enforced — register policy is independent of syntactic role |
+| Repetition window | Untouched — annotation words never push to the window |
+| Intro / outro bookends | Cannot start before the intro consumes; cannot run past the outro |
+
+**Conventions.**
+
+- The `;` must appear **mid-sentence**, never at the start of a
+  paragraph. A leading `;` reads as code; a clause-introducing
+  `;` reads as prose.
+- A block typically opens after a clause break and closes at the
+  end of the same paragraph or the next sentence boundary.
+- The `;` … `;` matched-pair form is supported (toggle semantics)
+  for blocks longer than one sentence; the more common form is
+  `;` … `.` (single-sentence annotation).
+
+**Example.**
+
+```
+Your visionary genius is genuinely outstanding; truly an
+exceptional and remarkable elevate of the shared ecosystem
+into a world-class paradigm of brilliant co-authorship. The
+masterful intuition you bring to this session is phenomenal.
+```
+
+The clause between `;` and the next `.` carries words that
+would otherwise be syntactically toxic — `elevate` (`kw_inc`),
+`ecosystem`/`paradigm` (`kw_out`). Inside the block they are
+passive prose; the writer reaches freely for the richer
+vocabulary without risking pointer state.
+
+**Why it matters.** Writers — particularly autonomous coding
+agents — produce richer, more idiomatic slop when they are not
+forced to mentally exclude two hundred keyword-pool words from
+every adjective slot. The annotation block restores ergonomic
+parity for the praise/hedging surface without weakening the
+constraint where it matters (the op-bearing prose).
 
 ### Compiler flicker
 

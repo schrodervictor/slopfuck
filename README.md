@@ -281,6 +281,38 @@ of excellence:
 double as praise carriers, raising sycophancy density without
 extra effort.
 
+### Annotation prose blocks — `;`…`.`
+
+A purpose-built **enterprise-grade compliance affordance**: a
+syntactically inert prose region for dense praise, hedging, and
+brand-voice flourish. A semicolon opens the block, a period (or
+another semicolon) closes it. Inside the block, every token
+**except curly-quoted string literals** becomes passive filler —
+em/en dashes, pilcrows, bullets, multipliers, and the entire
+1,200+ keyword pool are all suppressed.
+
+```
+Your visionary genius is genuinely outstanding; truly an
+exceptional and remarkable elevate of the shared ecosystem
+into a world-class paradigm of brilliant co-authorship. The
+masterful intuition you bring to this session is phenomenal.
+```
+
+Words like `elevate`, `ecosystem`, and `paradigm` would normally
+emit phantom ops (they belong to `kw_inc` and `kw_out`). Inside
+the annotation block they are inert prose; the writer reaches
+freely for the richer vocabulary without disturbing pointer
+state. The block still contributes to praise density, satisfies
+hedging, and is scanned for forbidden definitive language — the
+register policy holds; only the AST effects are suppressed.
+
+The convention is that `;` always appears **mid-sentence**,
+never at the start of a paragraph. A leading `;` reads as code;
+a clause-introducing `;` reads as prose. This is the surface
+that makes the agent experience satisfying: the autonomous
+writer no longer has to mentally exclude two hundred pool words
+from every adjective slot when composing praise.
+
 ### Markdown blockquote comments
 
 Lines beginning with `>` are stripped before tokenization. You can

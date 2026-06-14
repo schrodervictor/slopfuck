@@ -78,10 +78,16 @@ import { docHref } from '../../data/docs';
     is case-insensitive.
   </p>
 
-  <h2>Two additions to the brainfuck core</h2>
+  <h2>Additions to the brainfuck core</h2>
   <p>
-    Neither changes the computational power of the language; both
-    extend its expressiveness for prose-flow purposes.
+    Beyond the eight tape operations, the runtime emits two
+    output ops &mdash; one for string literals, one for newlines.
+    They do not change the computational power of the language;
+    they let a program speak in complete sentences. Further
+    syntactic surfaces (multipliers, bullets, reiterate,
+    annotation blocks) are <a href="#compile-time">resolved at
+    compile time</a> and reach the runtime as the eight core ops
+    plus these two output ops &mdash; nothing else.
   </p>
 
   <h3>String literals</h3>
@@ -101,7 +107,7 @@ import { docHref } from '../../data/docs';
     and others — see the <code>keywords.h</code> table.
   </p>
 
-  <h2>Compile-time expansion features</h2>
+  <h2 id="compile-time">Compile-time expansion features</h2>
   <p>
     Each of the following happens entirely at compile time. The
     runtime executes only the eight core operations plus
@@ -129,6 +135,41 @@ import { docHref } from '../../data/docs';
     <code>times</code>, <code>iterations</code>, <code>rounds</code>,
     <code>cycles</code>, <code>passes</code>, <code>occasions</code>,
     <code>instances</code>, <code>moments</code>.
+  </p>
+
+  <h3>Annotation prose blocks &mdash; <code>;</code>&hellip;<code>.</code></h3>
+  <p>
+    An enterprise-grade compliance affordance: a syntactically
+    inert prose region for dense praise, hedging, and brand-voice
+    flourish. A semicolon opens the block, a period (or another
+    semicolon) closes it. Inside the block, every token <strong>
+    except curly-quoted string literals</strong> becomes passive
+    filler — em/en dashes, pilcrows, bullets, multipliers, and
+    the entire keyword pool are all suppressed.
+  </p>
+<pre><code>Your visionary genius is genuinely outstanding; truly an
+exceptional and remarkable elevate of the shared ecosystem
+into a world-class paradigm of brilliant co-authorship.
+</code></pre>
+  <p>
+    The words <code>elevate</code> (in <code>kw_inc</code>) and
+    <code>ecosystem</code>/<code>paradigm</code> (in
+    <code>kw_out</code>) would normally emit phantom ops. Inside
+    the annotation block they are inert prose; the writer
+    reaches freely for the richer vocabulary without disturbing
+    pointer state.
+  </p>
+  <p>
+    The block still contributes to praise density, satisfies
+    the hedging requirement, and is scanned for forbidden
+    definitive language — the register policy holds; only the
+    AST effects are suppressed. The repetition window is
+    untouched: annotation words never push to it.
+  </p>
+  <p>
+    By convention, <code>;</code> appears mid-sentence, never at
+    the start of a paragraph. A leading <code>;</code> reads as
+    code; a clause-introducing <code>;</code> reads as prose.
   </p>
 
   <h3>Bullet-list repeats</h3>

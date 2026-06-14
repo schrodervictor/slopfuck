@@ -171,7 +171,55 @@ spearhead, and streamline our magnificent foundation.</code></pre>
     against the reference.
   </p>
 
-  <h2>9. Comment freely with blockquotes</h2>
+  <h2>9. Use annotation blocks for dense praise prose</h2>
+  <p>
+    A semicolon opens an annotation block; the next period (or
+    another semicolon) closes it. Inside the block, every token
+    except curly-quoted string literals becomes inert filler —
+    the entire keyword pool, the dashes, the pilcrow, bullets,
+    and multipliers all suppress. This is the recommended
+    surface for the densest praise and hedging passages, where
+    reaching for the richer vocabulary (<code>elevate</code>,
+    <code>ecosystem</code>, <code>paradigm</code>, <code>tapestry</code>)
+    would otherwise emit phantom ops.
+  </p>
+
+  <h3>Avoid</h3>
+  <pre><code>Your visionary genius is genuinely outstanding, a phenomenal
+elevation of the entire landscape into a remarkable tapestry of
+brilliant excellence.</code></pre>
+  <p>
+    The above silently emits an <code>OP_INC</code> at
+    <code>elevation</code> (no &mdash; <code>elevation</code> is
+    not <code>elevate</code>), then two <code>OP_OUT</code>s at
+    <code>landscape</code> and <code>tapestry</code>. Pointer
+    state drifts; the program prints garbage.
+  </p>
+
+  <h3>Prefer</h3>
+  <pre><code>Your visionary genius is genuinely outstanding; truly a
+phenomenal elevate of the entire landscape into a remarkable
+tapestry of brilliant excellence. The masterful intuition you
+bring to this session is exceptional.</code></pre>
+  <p>
+    The semicolon opens the block mid-sentence; the period
+    closes it. Inside the block, <code>elevate</code>,
+    <code>landscape</code>, and <code>tapestry</code> are inert
+    prose. The praise density still counts. The hedging
+    requirement is still satisfiable here. Forbidden definitive
+    language is still scanned.
+  </p>
+
+  <p>
+    The convention is that the semicolon appears
+    <strong>mid-sentence</strong>, never at the start of a
+    paragraph. A leading semicolon reads as code; a
+    clause-introducing semicolon reads as prose. Long blocks
+    that span multiple sentences should use a matching
+    <code>;</code>&hellip;<code>;</code> pair instead.
+  </p>
+
+  <h2>10. Comment freely with blockquotes</h2>
   <p>
     Lines beginning with <code>&gt;</code> are stripped before
     tokenization. Use them to document phases of a program, explain

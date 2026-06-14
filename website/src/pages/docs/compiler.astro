@@ -13,11 +13,11 @@ import { URL_DESIGN, URL_IDEAS, GITHUB_REPO } from '../../data/site';
   <p>The compiler runs the following passes in order:</p>
 
   <ol>
-    <li><strong>Tokenize.</strong> Read UTF-8, strip blockquote comments, emit em / en dashes, string literals, bullet markers, pilcrows, and words.</li>
+    <li><strong>Tokenize.</strong> Read UTF-8, strip blockquote comments, emit em / en dashes, string literals, bullet markers, pilcrows, annotation-block markers (<code>;</code> and <code>.</code>), and words.</li>
     <li><strong>Validate intro.</strong> Consume the first N words matching a sycophantic opener pool.</li>
     <li><strong>Validate outro.</strong> Consume the last N words (skipping trailing strings) matching a call-to-action closer pool.</li>
     <li><strong>Validate forbidden language.</strong> Scan the remaining tokens for words like <code>no</code>, <code>never</code>, <code>impossible</code>, <code>always</code>.</li>
-    <li><strong>Compile.</strong> Words → opcodes. Inline checks for prefix multipliers, postfix multipliers, bullet repeats, reiterate expansion, and prose-repetition.</li>
+    <li><strong>Compile.</strong> Words → opcodes. Inline checks for prefix multipliers, postfix multipliers, bullet repeats, reiterate expansion, annotation-block suppression, and prose-repetition.</li>
     <li><strong>Validate praise density.</strong> ≥3 praise words and ≥8% praise density in the filler.</li>
     <li><strong>Validate hedging.</strong> Programs over 50 filler words must contain a hedging phrase.</li>
     <li><strong>Validate bracket balance.</strong> Loop preambles and closers must match and nest.</li>
@@ -88,6 +88,28 @@ import { URL_DESIGN, URL_IDEAS, GITHUB_REPO } from '../../data/site';
     Any other op breaks the block. So in <code>&ldquo;First&rdquo;&para;
     delve &ldquo;Second&rdquo;&para; reiterate</code>, only
     <code>&ldquo;Second&rdquo;&para;</code> is copied.
+  </p>
+
+  <h3>How annotation blocks compile</h3>
+  <p>
+    The compile loop carries a single <code>in_free_prose</code>
+    flag. The <code>;</code> pseudo-token toggles the flag; the
+    <code>.</code> pseudo-token clears it (only if currently
+    set). While the flag is high, every branch of the compile
+    loop short-circuits: em/en dashes, pilcrows, bullets,
+    multipliers, single-word keywords, multi-word phrases, and
+    reiterate all become silent — the word is pushed to the
+    filler list and the iterator advances. String literals are
+    the single exception: they continue to emit
+    <code>OP_STRING</code> as normal.
+  </p>
+  <p>
+    The repetition window is bypassed entirely inside an
+    annotation block (keyword matches do not occur), which is
+    why writers can repeat <code>magnificent</code> ten times
+    inside a single block without tripping the validator. The
+    praise and hedging counters do still observe the
+    annotation's filler — that is the whole value proposition.
   </p>
 
   <h2>Why brainfuck stays preserved</h2>

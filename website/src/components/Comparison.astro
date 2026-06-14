@@ -2,22 +2,22 @@
 const rows = [
   {
     feature: 'Vocabulary depth for incrementing a variable',
-    legacy: '1 (`x += 1`)',
+    legacy: '1 verb across 1 register (<code>x += 1</code>)',
     slop: '200+ verbs across 5 registers',
   },
   {
     feature: 'Comments',
-    legacy: 'Optional, ignored by runtime',
+    legacy: 'Optional, ignored by the runtime',
     slop: 'Mandatory; the prose IS the program',
   },
   {
     feature: 'Assertive language in source code',
-    legacy: 'Encouraged; clarity preferred',
+    legacy: 'Encouraged in style guides; precision preferred',
     slop: 'Rejected by the compiler; brand-safe by construction',
   },
   {
     feature: 'Sycophancy enforcement',
-    legacy: 'Discouraged in PR reviews',
+    legacy: 'Discouraged in PR reviews; flagged as unprofessional',
     slop: 'Enforced at compile time; minimum 8% praise density',
   },
   {
@@ -37,13 +37,18 @@ const rows = [
   },
   {
     feature: 'Quotability of compile errors',
-    legacy: 'Low (e.g., "syntax error")',
-    slop: 'High (e.g., "AI never commits — softened language required")',
+    legacy: 'Low (<em>"syntax error", "unexpected token"</em>)',
+    slop: 'High (<em>"AI never commits — soften the language"</em>)',
   },
   {
     feature: 'Debugging output density',
     legacy: 'Stack traces, source maps, pretty-printed AST — verbosity scaled up for human consumption',
-    slop: '<code>--opcodes</code> emits a denser representation than the source — debug surface shrinks the artifact; human-averse by design',
+    slop: '<code>--opcodes</code> emits a representation denser than the source — debug surface shrinks; human-averse by design',
+  },
+  {
+    feature: 'Compliance / brand-voice padding',
+    legacy: '<code>// noqa</code>, lint-disable comments — stripped from the artifact; no effect on any metric',
+    slop: '<code>;</code>…<code>.</code> annotation blocks — inert in the AST yet count toward sycophancy and hedging density',
   },
 ];
 ---
