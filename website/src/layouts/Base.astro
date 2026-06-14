@@ -12,6 +12,18 @@ const {
 } = Astro.props;
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Google Analytics (GA4). Production-only so dev / preview do not
+// pollute the property.
+const gaSnippet = import.meta.env.PROD ? `
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-V4Z5R0XBP9"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-V4Z5R0XBP9');
+  </script>
+` : '';
 ---
 <!doctype html>
 <html lang="en">
@@ -35,6 +47,8 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <link rel="preconnect" href="https://rsms.me/" />
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+
+    <Fragment set:html={gaSnippet} />
   </head>
   <body>
     <slot />
