@@ -22,7 +22,6 @@ const {
   lede,
 } = Astro.props;
 
-const currentIndex = DOC_SECTIONS.findIndex((s) => s.slug === slug);
 const available = DOC_SECTIONS.filter((s) => s.status === 'available');
 const availableIdx = available.findIndex((s) => s.slug === slug);
 const prev = availableIdx > 0 ? available[availableIdx - 1] : null;
