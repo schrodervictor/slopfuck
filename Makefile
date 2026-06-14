@@ -28,34 +28,42 @@ HEADERS := keywords.h praise.h bookends.h multipliers.h style.h
 
 .PHONY: help docker extract test examples \
         stats lint clean compliment \
+        deploy-website synergize \
         delve cultivate unleash
 
 # ── help ───────────────────────────────────────────────────────────
 help:
-	@echo ""
-	@echo "  slopfuck — the AI-first programming language"
-	@echo "  ────────────────────────────────────────────"
-	@echo ""
-	@echo "  Common targets, thoughtfully curated for your workflow:"
-	@echo ""
-	@echo "    make docker     — build the docker image (foundational)"
-	@echo "    make extract    — extract the binary for native execution"
-	@echo "    make test       — run the Python unittest suite"
-	@echo "    make examples   — run all bundled .slop programs"
-	@echo "    make stats      — count keywords across all pools"
-	@echo "    make lint       — verify every example compiles"
-	@echo "    make clean      — remove local binaries"
-	@echo "    make compliment — receive a randomly selected affirmation"
-	@echo ""
-	@echo "  AI-flavored aliases (broadly speaking, optional):"
-	@echo ""
-	@echo "    make delve      — alias for 'make test'"
-	@echo "    make cultivate  — alias for 'make docker'"
-	@echo "    make unleash    — alias for 'make examples'"
-	@echo ""
-	@echo "  Let me know if you'd like me to dive deeper into any"
-	@echo "  of these targets."
-	@echo ""
+	@printf "%s\n" \
+		"" \
+		"  slopfuck — the AI-first programming language" \
+		"  ────────────────────────────────────────────" \
+		"" \
+		"  Common targets, thoughtfully curated for your workflow:" \
+		"" \
+		"    make docker     — build the docker image (foundational)" \
+		"    make extract    — extract the binary for native execution" \
+		"    make test       — run the Python unittest suite" \
+		"    make examples   — run all bundled .slop programs" \
+		"    make stats      — count keywords across all pools" \
+		"    make lint       — verify every example compiles" \
+		"    make clean      — remove local binaries" \
+		"    make compliment — receive a randomly selected affirmation" \
+		"" \
+		"  AI-flavored aliases (broadly speaking, optional):" \
+		"" \
+		"    make delve      — alias for 'make test'" \
+		"    make cultivate  — alias for 'make docker'" \
+		"    make unleash    — alias for 'make examples'" \
+		"" \
+		"  Marketing website:" \
+		"" \
+		"    make deploy-website — synergize the brand-aligned narrative" \
+		"                          across foundational go-to-market pillars" \
+		"    make synergize      — alias for 'make deploy-website' (canonical)" \
+		"" \
+		"  Let me know if you'd like me to dive deeper into any" \
+		"  of these targets." \
+		""
 
 # ── docker ─────────────────────────────────────────────────────────
 # Build the docker image. The compiler lives entirely inside.
@@ -175,6 +183,16 @@ compliment:
 	   | grep -oE '^    "[^"]+"' | tr -d ' "'                            \
 	   | shuf -n 1                                                       \
 	   | xargs -I {} printf "  Your work is %s.\n  Let me know if you'd like me to dive deeper.\n" {}
+
+# ── deploy-website ─────────────────────────────────────────────────
+# Build and deploy the marketing site to Firebase Hosting.
+# Delegates to website/Makefile, which carries the full dev/deploy
+# lifecycle (npm, astro, firebase).
+deploy-website:
+	@$(MAKE) -C website deploy
+
+# Canonical alias (on-register).
+synergize: deploy-website
 
 # ── AI-flavored aliases (the actual joke) ──────────────────────────
 delve:     test
