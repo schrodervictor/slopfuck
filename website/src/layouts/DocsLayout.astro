@@ -138,13 +138,19 @@ const next = availableIdx >= 0 && availableIdx < available.length - 1
     gap: 48px;
     align-items: start;
   }
-  @media (max-width: 880px) {
+  @media (max-width: 960px) {
     .docs-grid { grid-template-columns: 1fr; gap: 24px; }
+    .docs-pager { grid-template-columns: 1fr; }
+    .pager-card.pager-right { text-align: left; align-items: flex-start; }
   }
 
-  .docs-sidebar {
-    position: sticky;
-    top: 90px;
+  /* Sticky sidebar only on wide layouts; on narrow it must scroll
+     with the article or it covers content as the user scrolls. */
+  @media (min-width: 961px) {
+    .docs-sidebar {
+      position: sticky;
+      top: 90px;
+    }
   }
   .docs-sidebar nav h4 {
     font-size: 0.74rem;
