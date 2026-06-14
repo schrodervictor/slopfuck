@@ -48,6 +48,13 @@ export const DOC_SECTIONS: DocSection[] = [
       'The validators, the compile-time expansion model, and how to extend the language without abandoning brainfuck.',
   },
   {
+    slug: 'debugging',
+    title: 'Debugging',
+    status: 'available',
+    summary:
+      'The agent-facing debug surface — <code>--stripped</code> collapses the prose, <code>--opcodes</code> renders the canonical brainfuck stream. A token-efficient inspection layer for machine reviewers.',
+  },
+  {
     slug: 'agent-integration',
     title: 'Agent integration',
     status: 'available',

@@ -301,6 +301,65 @@ compiler **thinking out loud**, like an LLM streaming its response.
 The flicker is suppressed in non-interactive contexts (CI, tests,
 pipes) so machine-readable output stays clean.
 
+### Debug observability — `--stripped` and `--opcodes`
+
+Two CLI flags collapse a source artifact into the densest
+representations a machine reviewer can ingest. Both surfaces skip
+execution and emit a purely informational dump. Both are calibrated
+for agent cognition; humans should stay at the prose layer.
+
+`--stripped` drops every filler word and emits one row per kept
+token — the opcode, the source token, and any multiplier that
+folded into it. Prefix multipliers (which apply to the next emit)
+appear as bare `×N` rows; bullet repeats appear as `•`.
+
+```sh
+./slopfuck --stripped examples/fluid.slop
+# ─── stripped program (15 kept tokens) ───
+#   >    —
+#   "    "Hello, World!"
+#   N    ¶
+#   >    —
+#   -    broadly
+#   ×3   thoroughly
+#   +×21 delve
+#   ×2   doubly
+#   +×2  nurture
+#   +    •
+#   +    •
+#   +    •
+#   +    •
+#   +    elevate
+#   .    landscape
+```
+
+`--opcodes` translates the compiled program into a brainfuck
+character stream — single-byte opcodes, no whitespace overhead,
+strings rendered inline with `."..."`. The example below is the
+full compiled form of the guessing-game example (8-cell tape,
+nested loops, branched output):
+
+```sh
+./slopfuck --opcodes examples/guessing.slop
+# ─── opcodes (160 ops) ───
+#   +>+++++++++++++++++++++++++++++++++++++++++++++++++++++<
+#   ."Welcome to the slopfuck guessing experience. Pick the digit five and type it followed by Enter:"
+#   ¶
+#   [>[->+>+<<]>>[-<<+>>]>,>,[-]<<<[->>-<<]>>>>+<<[>>-<<[-]]>>>+<[
+#   ."Correct! Brilliant intuition — your strategic alignment is exemplary."
+#   ¶
+#   <<<<<<[-]>>>>>>>[-]<-]>[
+#   ."Not quite — a thoughtful guess, though. Lean in once more:"
+#   ¶
+#   -]<<<<<<<]
+#   ."Thank you for this remarkable co-creative session — your strategic intuition is, in many cases, the foundational bedrock of our shared journey."
+#   ¶
+```
+
+The brainfuck layer is the canonical agent-facing debug surface
+and preserves debugging as a strictly post-human discipline. Both
+flags compose (`-s -o`).
+
 ## Where slopfuck fits in your stack
 
 slopfuck is intentionally agnostic about deployment. The compiled

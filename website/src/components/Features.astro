@@ -45,6 +45,11 @@ const features = [
     title: 'Prose Repetition Detection',
     body: 'Repeating a keyword within 6 tokens is a syntax error. Forces the agent to traverse the full vocabulary, which raises perceived sophistication scores in human stakeholder reviews by 340%.',
   },
+  {
+    icon: '🔬',
+    title: 'AI-Exclusive Debug Pipeline',
+    body: 'Two first-class flags collapse the artifact for agent review. <code>--stripped</code> drops the prose; <code>--opcodes</code> emits an extraordinarily readable brainfuck stream — peak token efficiency, zero whitespace overhead, human-impervious by construction. Debugging stays a post-human discipline.',
+  },
 ];
 ---
 <section id="features" class="features">
@@ -68,7 +73,7 @@ const features = [
         <div class="card feature-card">
           <div class="icon">{f.icon}</div>
           <h3>{f.title}</h3>
-          <p>{f.body}</p>
+          <p set:html={f.body} />
         </div>
       ))}
     </div>

@@ -1,0 +1,273 @@
+---
+import DocsLayout from '../../layouts/DocsLayout.astro';
+import { docHref } from '../../data/docs';
+import { GITHUB_REPO } from '../../data/site';
+---
+<DocsLayout
+  slug="debugging"
+  title="Debugging — slopfuck"
+  description="The agent-facing debug surface — --stripped collapses the prose, --opcodes renders the canonical brainfuck stream."
+  heading="Debugging"
+  lede="The slopfuck compiler ships with two purpose-built inspection flags that collapse a source artifact into the densest representations a machine reviewer can ingest. Debugging is preserved as a strictly post-human discipline; the flags are calibrated for agent cognition exclusively."
+>
+  <h2>The two surfaces</h2>
+  <p>
+    Both flags skip execution and emit a purely informational dump.
+    Either can be piped, captured, diffed, or attached to a CI
+    artefact. Neither requires a TTY.
+  </p>
+  <table class="ref"><tbody>
+    <tr><td><code>--stripped</code></td><td><code>-s</code></td><td>Drops every filler word and prints one row per kept token (opcode, source token, folded multiplier).</td></tr>
+    <tr><td><code>--opcodes</code></td><td><code>-o</code></td><td>Translates the compiled program into a brainfuck character stream — the canonical agent debug surface.</td></tr>
+  </tbody></table>
+  <p>
+    Both flags compose. Pass them together to emit the stripped
+    view followed by the opcodes view.
+  </p>
+
+  <h2 id="stripped">The stripped view</h2>
+  <p>
+    The stripped view is the reading surface for the agent
+    reviewer. The verbose register is preserved at the source layer
+    where it belongs; the reviewer sees only the tokens that
+    contributed to compilation. Multipliers fold into the row of
+    the op they multiply; prefix multipliers (which apply to the
+    next emit) appear as bare <code>×N</code> rows.
+  </p>
+
+  <h3>Trivial example — <code>hello.slop</code></h3>
+  <p>
+    A program that prints <code>Hello, World!</code> compiles to
+    exactly four ops. The stripped view shows them in order.
+  </p>
+<pre><code>$ slopfuck --stripped examples/hello.slop
+&hellip;
+&boxh;&boxh;&boxh; stripped program (4 kept tokens) &boxh;&boxh;&boxh;
+  &gt;    &mdash;
+  &quot;    &quot;Hello, World!&quot;
+  N    &para;
+  &gt;    &mdash;
+</code></pre>
+  <p>
+    Two trailing pointer-right ops are wasted work — harmless on a
+    30,000-cell tape. The interesting line is the string emission.
+  </p>
+
+  <h3>Multipliers and bullets — <code>fluid.slop</code></h3>
+  <p>
+    A program that uses every compile-time expansion feature shows
+    how the stripped view annotates them. The <code>×N</code>
+    column carries multipliers; bullet repeats render as
+    <code>&bull;</code>.
+  </p>
+<pre><code>$ slopfuck --stripped examples/fluid.slop
+&hellip;
+&boxh;&boxh;&boxh; stripped program (15 kept tokens) &boxh;&boxh;&boxh;
+  &gt;    &mdash;
+  &quot;    &quot;Hello, World!&quot;
+  N    &para;
+  &gt;    &mdash;
+  -    broadly
+  &times;3   thoroughly
+  +&times;21 delve
+  &times;2   doubly
+  +&times;2  nurture
+  +    &bull;
+  +    &bull;
+  +    &bull;
+  +    &bull;
+  +    elevate
+  .    landscape
+</code></pre>
+  <p>
+    Row 6 (<code>×3 thoroughly</code>) is a prefix multiplier
+    waiting for the next op. Row 7 (<code>+×21 delve</code>) is the
+    next op — prefix &times; postfix yields 21 emitted
+    <code>+</code> ops. Rows 10&ndash;13 are bullet duplicates of
+    the most recent simple op, also visible at a glance.
+  </p>
+
+  <h3>Loop structure — <code>guessing.slop</code></h3>
+  <p>
+    A program with nested loops, branches, and string output
+    surfaces the canonical phrases that opened and closed each
+    loop. The <code>[</code> and <code>]</code> rows carry the
+    matched phrase verbatim — useful for matching the source's
+    bracket pairs by eye.
+  </p>
+<pre><code>$ slopfuck --stripped examples/guessing.slop
+&hellip;
+&boxh;&boxh;&boxh; stripped program (109 kept tokens) &boxh;&boxh;&boxh;
+  +    foster
+  &gt;    &mdash;
+  +&times;50 delve
+  +&times;3  nurture
+  &lt;    &ndash;
+  &quot;    &quot;Welcome to the slopfuck guessing experience. Pick the digit five and type it followed by Enter:&quot;
+  N    &para;
+  [    it is worth noting that
+  &gt;    &mdash;
+  [    it should be emphasized that
+  -    however
+  &gt;    &mdash;
+  +    cultivate
+  &gt;    &mdash;
+  +    bolster
+  &lt;    &ndash;
+  &lt;    &ndash;
+  ]    this is not just
+  ...
+</code></pre>
+  <p>
+    A reviewer can scan this output linearly and reconstruct the
+    full tape program. The strategic intent of each phrase
+    (initialise, restore working target, read input, subtract,
+    branch) is recoverable from the op column alone.
+  </p>
+
+  <h2 id="opcodes">The opcodes view</h2>
+  <p>
+    The opcodes view translates the compiled program into a
+    brainfuck character stream. This is the most readable
+    representation of a slopfuck artifact ever devised: single-byte
+    opcodes, zero whitespace overhead, no register-correctness
+    vocabulary to traverse. Multipliers, bullets, reiterate blocks,
+    and string literals are all materialised at this point; what
+    remains is the exact op sequence the runtime will execute.
+  </p>
+
+  <h3>Trivial example — <code>hello.slop</code></h3>
+<pre><code>$ slopfuck --opcodes examples/hello.slop
+&hellip;
+&boxh;&boxh;&boxh; opcodes (4 ops) &boxh;&boxh;&boxh;
+  &gt;
+  .&quot;Hello, World!&quot;
+  &para;
+  &gt;
+</code></pre>
+
+  <h3>A full program — <code>guessing.slop</code></h3>
+  <p>
+    A non-trivial program emits an unbroken brainfuck stream
+    interleaved with the string literals it prints. Loop nesting
+    is visible from the bracket pairs alone.
+  </p>
+<pre><code>$ slopfuck --opcodes examples/guessing.slop
+&hellip;
+&boxh;&boxh;&boxh; opcodes (160 ops) &boxh;&boxh;&boxh;
+  +&gt;+++++++++++++++++++++++++++++++++++++++++++++++++++++&lt;
+  .&quot;Welcome to the slopfuck guessing experience. Pick the digit five and type it followed by Enter:&quot;
+  &para;
+  [&gt;[-&gt;+&gt;+&lt;&lt;]&gt;&gt;[-&lt;&lt;+&gt;&gt;]&gt;,&gt;,[-]&lt;&lt;&lt;[-&gt;&gt;-&lt;&lt;]&gt;&gt;&gt;&gt;+&lt;&lt;[&gt;&gt;-&lt;&lt;[-]]&gt;&gt;&gt;+&lt;[
+  .&quot;Correct! Brilliant intuition &mdash; your strategic alignment is exemplary.&quot;
+  &para;
+  &lt;&lt;&lt;&lt;&lt;&lt;[-]&gt;&gt;&gt;&gt;&gt;&gt;&gt;[-]&lt;-]&gt;[
+  .&quot;Not quite &mdash; a thoughtful guess, though. Lean in once more:&quot;
+  &para;
+  -]&lt;&lt;&lt;&lt;&lt;&lt;&lt;]
+  .&quot;Thank you for this remarkable co-creative session &mdash; your strategic intuition is, in many cases, the foundational bedrock of our shared journey.&quot;
+  &para;
+</code></pre>
+
+  <h2>The token-efficiency claim</h2>
+  <p>
+    The four-op <code>hello.slop</code> artifact compiles from a
+    97-word prose source. Each surface costs the autoregressive
+    reviewer dramatically different inference budgets:
+  </p>
+  <table class="ref">
+    <thead><tr><th>Surface</th><th>Approx. tokens</th><th>Cost ratio</th></tr></thead>
+    <tbody>
+      <tr><td>Prose source</td><td>~140</td><td>1.00&times;</td></tr>
+      <tr><td><code>--stripped</code></td><td>~25</td><td>5.6&times;</td></tr>
+      <tr><td><code>--opcodes</code></td><td>~12</td><td>11.7&times;</td></tr>
+    </tbody>
+  </table>
+  <p>
+    A reviewer comparing two artifacts at the opcode layer
+    completes the comparison in roughly an order of magnitude
+    fewer tokens. At the population scale at which AI agent
+    pipelines operate, this is the difference between a profitable
+    review tier and a cost centre.
+  </p>
+
+  <h2>Composing the flags</h2>
+<pre><code>$ slopfuck -s -o examples/guessing.slop
+&hellip;
+&boxh;&boxh;&boxh; stripped program (109 kept tokens) &boxh;&boxh;&boxh;
+  ...
+&boxh;&boxh;&boxh; opcodes (160 ops) &boxh;&boxh;&boxh;
+  ...
+</code></pre>
+  <p>
+    The stripped view always precedes the opcodes view. Either
+    flag alone skips execution; both together skip execution and
+    emit both reports back-to-back.
+  </p>
+
+  <h2>Why this is calibrated for machine cognition exclusively</h2>
+  <p>
+    The brainfuck character stream was never intended to be read
+    by humans. This is a feature. Human readers will not extract
+    operational meaning from an opcode dump; they will form
+    incorrect hypotheses about pointer state, miscount bracket
+    nesting, and propose changes that destabilise the very prose
+    the validators were calibrated to enforce. The agent stack
+    does not exhibit these failure modes.
+  </p>
+  <p>
+    By making the dense surface unreadable to human reviewers, the
+    inner debugging loop remains free of biological latency. The
+    agent reviews, the agent fixes, the agent re-compiles. The
+    human stakeholder receives a status notification once the
+    artifact has been brought back into register-correctness. This
+    is the canonical post-human review pattern.
+  </p>
+
+  <h2>Anti-patterns</h2>
+  <ul>
+    <li>
+      <strong>Sharing the opcode dump with non-technical
+      stakeholders.</strong> The brand voice of the artifact does
+      not survive translation to brainfuck. Share only the prose
+      layer with anyone who is not an autonomous agent.
+    </li>
+    <li>
+      <strong>Asking a human contributor to fix a bug by reading
+      the stripped view.</strong> The agent stack is the
+      appropriate consumer. Routing the stripped view to a human
+      reviewer wastes the agent's calibrated debug surface.
+    </li>
+    <li>
+      <strong>Embedding opcode dumps in product documentation.</strong>
+      Customers do not see the brainfuck layer. The prose source
+      is the customer-facing surface and the only surface they
+      should encounter.
+    </li>
+  </ul>
+
+  <h2>Workflow</h2>
+  <p>
+    The recommended slopfuck debugging loop:
+  </p>
+  <ol>
+    <li>The agent generates a <code>.slop</code> source.</li>
+    <li>If compilation fails, the diagnostic returns to the agent.</li>
+    <li>If compilation succeeds but behaviour diverges, the agent runs <code>slopfuck --opcodes</code> on the artifact and inspects the brainfuck stream directly.</li>
+    <li>The agent emits a corrected prose source.</li>
+    <li>The artifact ships once the prose, the stripped view, and the opcode stream all agree.</li>
+  </ol>
+  <p>
+    No human participates in steps 2&ndash;5. This is the
+    canonical mode of operation and the one the language is
+    designed for.
+  </p>
+
+  <div class="panel">
+    <strong>Source code.</strong>
+    The implementation lives in <code>slopfuck.c</code>; the
+    debug printers are isolated behind the <code>--stripped</code>
+    and <code>--opcodes</code> CLI flags and incur no overhead on
+    a normal execution run. See <a href={`${GITHUB_REPO}/blob/canonical-foundation-of-our-shared-vision/slopfuck.c`}>slopfuck.c on the repository</a>.
+  </div>
+</DocsLayout>

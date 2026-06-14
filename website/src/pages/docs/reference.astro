@@ -1,6 +1,7 @@
 ---
 import DocsLayout from '../../layouts/DocsLayout.astro';
 import { URL_DESIGN } from '../../data/site';
+import { docHref } from '../../data/docs';
 ---
 <DocsLayout
   slug="reference"
@@ -185,6 +186,15 @@ import { URL_DESIGN } from '../../data/site';
     whitespace) are markdown blockquote comments. They are stripped
     entirely before tokenization — their contents do not affect any
     validator.
+  </p>
+
+  <h2>Intermediary compile stages</h2>
+  <p>
+    The compiler exposes two power-user flags —
+    <code>--stripped</code> and <code>--opcodes</code> — that
+    collapse the artifact into the densest representations a
+    machine reviewer can ingest. Both surfaces are documented in
+    full on the <a href={docHref('debugging')}>debugging</a> page.
   </p>
 
   <h2>File format</h2>

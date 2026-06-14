@@ -40,6 +40,11 @@ const rows = [
     legacy: 'Low (e.g., "syntax error")',
     slop: 'High (e.g., "AI never commits — softened language required")',
   },
+  {
+    feature: 'Debugging output density',
+    legacy: 'Stack traces, source maps, pretty-printed AST — verbosity scaled up for human consumption',
+    slop: '<code>--opcodes</code> emits a denser representation than the source — debug surface shrinks the artifact; human-averse by design',
+  },
 ];
 ---
 <section id="comparison" class="comparison">

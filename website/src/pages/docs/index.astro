@@ -30,7 +30,7 @@ import { DOC_SECTIONS, docHref } from '../../data/docs';
           s.status === 'available' ? (
             <a href={docHref(s.slug)} class="card doc-card">
               <h3>{s.title}</h3>
-              <p>{s.summary}</p>
+              <p set:html={s.summary} />
               <span class="arrow">Read →</span>
             </a>
           ) : (
@@ -39,7 +39,7 @@ import { DOC_SECTIONS, docHref } from '../../data/docs';
                 <h3>{s.title}</h3>
                 <span class="pill">forthcoming</span>
               </div>
-              <p>{s.summary}</p>
+              <p set:html={s.summary} />
             </div>
           )
         ))}
